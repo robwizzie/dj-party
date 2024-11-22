@@ -1,7 +1,9 @@
+import { require } from 'module';
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const process = require('process');
 
 const app = express();
 app.use(cors());
