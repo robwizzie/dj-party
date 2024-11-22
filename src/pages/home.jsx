@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button } from '../components/ui/button';
 import { useSpotifyAuth } from '../contexts/spotify-auth-context';
 import { useNavigate } from 'react-router-dom';
