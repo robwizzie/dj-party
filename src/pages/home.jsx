@@ -22,7 +22,7 @@ export function Home() {
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-8">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">
-            Spotify Party
+            DJ Party
           </h1>
           
           {user && (

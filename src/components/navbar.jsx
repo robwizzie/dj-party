@@ -18,7 +18,7 @@ export function Navbar() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <Music2 className="w-8 h-8 text-spotify-green" />
-          <span className="text-xl font-bold text-white">Spotify Party</span>
+          <span className="text-xl font-bold text-white">DJ Party</span>
         </Link>
         
         <div className="flex items-center space-x-4">
