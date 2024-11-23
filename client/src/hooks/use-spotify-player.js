@@ -209,6 +209,30 @@ export function useSpotifyPlayer() {
         }
     };
 
+    const seek = async(position) => {
+        if (!playerInstance.current) {
+            console.error('Player not ready');
+            return;
+        }
+
+        try {
+            await playerInstance.current.seek(position);
+            const state = await playerInstance.current.getCurrentState();
+            if (state) {
+                setPlaybackState(state);
+            }
+        } catch (error) {
+            console.error('Error seeking:', error);
+        }
+    };
+
+    const getCurrentState = async() => {
+        if (!playerInstance.current) {
+            return null;
+        }
+        return await playerInstance.current.getCurrentState();
+    };
+
     return {
         player: playerInstance.current,
         deviceId,
@@ -219,7 +243,9 @@ export function useSpotifyPlayer() {
             togglePlay,
             nextTrack,
             startPlayback,
-            setVolume
+            setVolume,
+            seek,
+            getCurrentState
         }
     };
 }
