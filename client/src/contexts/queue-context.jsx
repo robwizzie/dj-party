@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
-import { useSpotifyPlayer } from '../hooks/use-spotify-player';
 import useSpotifyAuthStore from './useSpotifyAuthStore';
+import usePlayerStore from './usePlayerStore';
 
 const QueueContext = createContext(null);
 
@@ -12,7 +12,7 @@ export function QueueProvider({ children }) {
 		deviceId,
 		isActive,
 		controls: { startPlayback }
-	} = useSpotifyPlayer();
+	} = usePlayerStore();
 
 	const addToQueue = track => {
 		const queueItem = {
@@ -31,7 +31,7 @@ export function QueueProvider({ children }) {
 		if (!currentTrack) {
 			setCurrentTrack(queueItem);
 			if (deviceId && isActive) {
-				startPlayback(deviceId, [queueItem.uri]);
+				startPlayback([queueItem.uri]);
 			}
 		} else {
 			setQueue(prevQueue => [...prevQueue, queueItem]);

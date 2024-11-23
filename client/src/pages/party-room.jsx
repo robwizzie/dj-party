@@ -4,15 +4,15 @@ import { Queue } from '../components/party-room/queue';
 import { Player } from '../components/party-room/player';
 import { Search } from '../components/party-room/search';
 import { useParams } from 'react-router-dom';
-import { useSpotifyPlayer } from '../hooks/use-spotify-player';
 import { useQueue } from '../contexts/queue-context';
 import { QueueProvider } from '../contexts/queue-context';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
+import usePlayerStore from '../contexts/usePlayerStore';
 
 function PartyRoomContent() {
 	const { roomId } = useParams();
 	const user = useSpotifyAuthStore(store => store.user);
-	const { deviceId, isActive } = useSpotifyPlayer();
+	const { deviceId, isActive } = usePlayerStore();
 	const { addToQueue, playNext } = useQueue();
 
 	const handleTrackSelect = track => {

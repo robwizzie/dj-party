@@ -5,6 +5,7 @@ import { useSpotifyPlayer } from '../../hooks/use-spotify-player';
 import { useQueue } from '../../contexts/queue-context';
 import * as Slider from '@radix-ui/react-slider';
 import usePlayerStore from '../../contexts/usePlayerStore';
+import useSpotifyAuthStore from '../../contexts/useSpotifyAuthStore';
 
 const formatTime = ms => {
 	const seconds = Math.floor((ms / 1000) % 60);
@@ -152,12 +153,12 @@ export function Player({ onTrackEnd }) {
 		<div className="bg-spotify-gray rounded-lg p-6">
 			{isPaused}
 			{/* Album Art and Track Info */}
-			{/* <SongInfo /> */}
+			<SongInfo />
 
 			{/* Progress Bar and Controls */}
 			<div className="mt-6 space-y-4">
 				{/* Progress Bar */}
-				{/* <ProgressBar /> */}
+				<ProgressBar />
 
 				{/* Playback Controls */}
 				{/* <PlaybackControls /> */}
@@ -167,11 +168,16 @@ export function Player({ onTrackEnd }) {
 }
 
 function SongInfo() {
+	const currentTrack = usePlayerStore(state => state.currentTrack);
+
+	// What is the use case where the current track isn't the display track?
+	const isCurrentTrackInQueue = true;
+
 	return (
 		<div className="flex items-center space-x-4 album-art">
-			{displayTrack ? (
+			{currentTrack ? (
 				<img
-					src={displayTrack.albumImage || displayTrack.album.images[0].url}
+					src={currentTrack.albumImage || currentTrack.album.images[0].url}
 					alt="Album Art"
 					className={`w-24 h-24 rounded-md transition-all duration-200 ${
 						isCurrentTrackInQueue ? 'ring-2 ring-spotify-green shadow-lg' : ''
@@ -189,21 +195,37 @@ function SongInfo() {
 						isCurrentTrackInQueue ? 'text-spotify-green' : 'text-white'
 					}`}
 				>
-					{displayTrack?.name || 'Search for a song to play'}
+					{currentTrack?.name || 'Search for a song to play'}
 				</h3>
-				<p className="text-sm text-white/60">{displayTrack?.artists?.[0]?.name || 'Add songs to your queue'}</p>
+				<p className="text-sm text-white/60">{currentTrack?.artists?.[0]?.name || 'Add songs to your queue'}</p>
 			</div>
 		</div>
 	);
 }
 
 function ProgressBar() {
+	const currentTrack = usePlayerStore(state => state.currentTrack);
+	const isPaused = usePlayerStore(state => state.isPaused);
+	const getPosition = usePlayerStore(state => state.getPosition);
+
+	const [progress, setProgress] = useState(0);
+
+	useEffect(() => {
+		if (isPaused) return;
+		const interval = setInterval(() => getPosition().then(setProgress), 1000);
+
+		return () => clearInterval(interval);
+	}, [isPaused, currentTrack?.id]);
+
+	function handleSeek() {}
+	function setIsDragging() {}
+
 	return (
 		<div className="space-y-2">
 			<Slider.Root
 				className="relative flex items-center select-none touch-none w-full h-5"
 				value={[progress]}
-				max={duration || 100}
+				max={currentTrack?.duration_ms || 100}
 				step={1000}
 				onValueChange={handleSeek}
 				onMouseDown={() => setIsDragging(true)}
@@ -222,7 +244,7 @@ function ProgressBar() {
 			</Slider.Root>
 			<div className="flex justify-between text-xs text-white/60">
 				<span>{formatTime(progress)}</span>
-				<span>{formatTime(duration)}</span>
+				<span>{formatTime(currentTrack?.duration_ms)}</span>
 			</div>
 		</div>
 	);

@@ -3,16 +3,15 @@ import useSpotifyAuthStore from './useSpotifyAuthStore';
 
 const usePlayerStore = create((set, get) => {
 	let accessToken = useSpotifyAuthStore.getState().accessToken;
+	console.log('initial at: ', accessToken);
 
 	let player;
-	let deviceId;
 
-	useSpotifyAuthStore.subscribe(
-		state => state.accessToken, // Select the part of the state to watch
-		accessToken => {
-			if (accessToken) initializePlayer();
-		}
-	);
+	useSpotifyAuthStore.subscribe(({ accessToken: at }) => {
+		if (accessToken === at) return;
+		accessToken = at;
+		initializePlayer();
+	});
 
 	initializePlayer();
 
@@ -66,8 +65,7 @@ const usePlayerStore = create((set, get) => {
 
 		player.addListener('ready', async ({ device_id }) => {
 			console.log('Player ready with device ID:', device_id);
-			deviceId = device_id;
-			set({ isActive: true, isLoading: false, isReady: true });
+			set({ isActive: true, isLoading: false, isReady: true, deviceId: device_id });
 
 			try {
 				await fetch('https://api.spotify.com/v1/me/player', {
@@ -88,7 +86,7 @@ const usePlayerStore = create((set, get) => {
 
 		player.addListener('not_ready', ({ device_id }) => {
 			console.log('Device ID is offline:', device_id);
-			deviceId = device_id;
+			set({ deviceId: device_id });
 		});
 
 		player.connect().then(success => {
@@ -107,7 +105,11 @@ const usePlayerStore = create((set, get) => {
 		const state = await player.getCurrentState();
 		console.log(state);
 		if (state) {
-			set({ paused: state.paused });
+			const currentTrack = state.track_window?.current_track;
+			set({
+				isPaused: state.paused,
+				...(get().currentTrack?.id === currentTrack.id ? {} : { currentTrack })
+			});
 		}
 	}
 
@@ -140,6 +142,8 @@ const usePlayerStore = create((set, get) => {
 	}
 
 	async function startPlayback(uris) {
+		const deviceId = get().deviceId;
+
 		if (!player || !deviceId) {
 			console.error('Player not ready or no device ID');
 			return;
@@ -202,12 +206,20 @@ const usePlayerStore = create((set, get) => {
 		}
 	};
 
+	async function getPosition() {
+		const state = await player.getCurrentState();
+		return state?.position;
+	}
+
 	return {
 		isLoading: false,
 		error: undefined,
 		isPaused: true,
 		isActive: false,
 		isReady: false,
+		deviceId: undefined,
+		currentTrack: undefined,
+		getPosition,
 		controls: {
 			togglePlay,
 			nextTrack,
