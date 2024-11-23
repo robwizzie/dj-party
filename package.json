@@ -9,5 +9,11 @@
 		"dev": "concurrently \"npm run client\" \"npm run server\""
 	},
 	"author": "",
-	"license": "ISC"
+	"license": "ISC",
+	"dependencies": {
+		"@radix-ui/react-slider": "^1.2.1"
+	},
+	"devDependencies": {
+		"concurrently": "^9.1.0"
+	}
 }

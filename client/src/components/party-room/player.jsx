@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'; // Add useState
-import { Play, Pause, SkipForward, Music2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Play, Pause, SkipForward, Music2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useSpotifyPlayer } from '../../hooks/use-spotify-player';
 import { useQueue } from '../../contexts/queue-context';
+import * as Slider from '@radix-ui/react-slider';
 
 export function Player({ onTrackEnd }) {
   const {
@@ -10,10 +11,11 @@ export function Player({ onTrackEnd }) {
     isActive,
     error,
     deviceId,
-    controls: { togglePlay, nextTrack, startPlayback },
+    controls: { togglePlay, nextTrack, startPlayback, setVolume },
   } = useSpotifyPlayer();
   
-  const [isPlaying, setIsPlaying] = useState(false); // Add local playing state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolumeState] = useState(0.5);
   const { currentTrack: queuedTrack, playNext } = useQueue();
 
   // Update isPlaying when playbackState changes
@@ -48,13 +50,19 @@ export function Player({ onTrackEnd }) {
 
   const handlePlayPause = async () => {
     console.log('Toggle play/pause, current state:', { isPlaying });
-    setIsPlaying(!isPlaying); // Toggle local state immediately for UI feedback
+    setIsPlaying(!isPlaying);
     await togglePlay();
   };
 
   const handleSkipTrack = async () => {
     console.log('Skipping track...');
     await playNext();
+  };
+
+  const handleVolumeChange = async (newVolume) => {
+    const volumeValue = newVolume[0]; // Slider returns an array
+    setVolumeState(volumeValue);
+    await setVolume(volumeValue);
   };
 
   const getDisplayTrack = () => {
@@ -106,29 +114,73 @@ export function Player({ onTrackEnd }) {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-center space-x-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handlePlayPause}
-          disabled={!displayTrack}
-          className="hover:bg-white/10 transition-colors duration-200"
-        >
-          {isPlaying ? (
-            <Play className="w-6 h-6" />
-          ) : (
-            <Pause className="w-6 h-6" />
-          )}
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleSkipTrack}
-          disabled={!displayTrack}
-          className="hover:bg-white/10 transition-colors duration-200"
-        >
-          <SkipForward className="w-6 h-6" />
-        </Button>
+      <div className="mt-6 flex flex-col space-y-4">
+        {/* Playback Controls */}
+        <div className="flex items-center justify-center space-x-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handlePlayPause}
+            disabled={!displayTrack}
+            className="hover:bg-white/10 transition-colors duration-200"
+          >
+            {isPlaying ? (
+              <Pause className="w-6 h-6" />
+            ) : (
+              <Play className="w-6 h-6" />
+            )}
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleSkipTrack}
+            disabled={!displayTrack}
+            className="hover:bg-white/10 transition-colors duration-200"
+          >
+            <SkipForward className="w-6 h-6" />
+          </Button>
+        </div>
+
+        {/* Volume Controls */}
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleVolumeChange([0])}
+            className="hover:bg-white/10 transition-colors duration-200"
+          >
+            <VolumeX className="w-4 h-4" />
+          </Button>
+          
+          <div className="flex-1">
+            <Slider.Root
+              className="relative flex items-center select-none touch-none w-full h-5"
+              defaultValue={[0.5]}
+              max={1}
+              step={0.01}
+              value={[volume]}
+              onValueChange={handleVolumeChange}
+              aria-label="Volume"
+            >
+              <Slider.Track className="bg-white/20 relative grow rounded-full h-1">
+                <Slider.Range className="absolute bg-white rounded-full h-full" />
+              </Slider.Track>
+              <Slider.Thumb
+                className="block w-3 h-3 bg-white rounded-full hover:bg-spotify-green focus:outline-none focus:ring-2 focus:ring-spotify-green"
+                aria-label="Volume"
+              />
+            </Slider.Root>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleVolumeChange([1])}
+            className="hover:bg-white/10 transition-colors duration-200"
+          >
+            <Volume2 className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

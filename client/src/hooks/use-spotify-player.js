@@ -195,6 +195,20 @@ export function useSpotifyPlayer() {
         }
     };
 
+    const setVolume = async(value) => {
+        if (!playerInstance.current) {
+            console.error('Player not ready');
+            return;
+        }
+
+        try {
+            const volume = Math.max(0, Math.min(1, value));
+            await playerInstance.current.setVolume(volume);
+        } catch (error) {
+            console.error('Error setting volume:', error);
+        }
+    };
+
     return {
         player: playerInstance.current,
         deviceId,
@@ -204,7 +218,8 @@ export function useSpotifyPlayer() {
         controls: {
             togglePlay,
             nextTrack,
-            startPlayback
+            startPlayback,
+            setVolume
         }
     };
 }
