@@ -9,6 +9,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use((req, res, next) => {
+	console.log(`Route called: ${req.method} ${req.originalUrl}`);
+	next();
+});
+
 app.use('/api', routes);
 
 app.use((req, res, next) => {
@@ -16,7 +21,7 @@ app.use((req, res, next) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`);
+	console.log(`Server running on port: ${PORT}`);
 });
 
 export default app;

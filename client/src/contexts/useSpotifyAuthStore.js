@@ -34,7 +34,7 @@ const useSpotifyAuthStore = create((set, get) => {
 	async function handleAuthCode(code) {
 		try {
 			console.log('Starting token exchange...');
-			const response = await fetch(`${API_URL}/api/token`, {
+			const response = await fetch(`${API_URL}/api/spotify/auth`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
