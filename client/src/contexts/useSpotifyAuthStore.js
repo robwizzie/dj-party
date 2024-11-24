@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { SpotifyApi } from '@spotify/web-api-ts-sdk';
+import { getCookie, setCookie } from '../utils/cookies';
 
 const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const SPOTIFY_REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
@@ -23,23 +24,27 @@ const useSpotifyAuthStore = create((set, get) => {
 	const params = new URLSearchParams(window.location.search);
 	const code = params.get('code');
 
+	const { accessToken: cookieToken, expirationDate } = JSON.parse(getCookie('spotifyAccessToken') || '{}');
+	const refreshToken = getCookie('spotifyRefreshToken');
+	if (cookieToken) handleExpiration(expirationDate, refreshToken);
+	else if (refreshToken) authorize({ refresh_token: refreshToken });
+
 	if (code) {
-		// Clear the URL to prevent reusing the same code
 		window.history.replaceState({}, document.title, window.location.pathname);
-		handleAuthCode(code);
+		authorize({ code });
 	} else {
 		set({ isLoading: false });
 	}
 
-	async function handleAuthCode(code) {
+	async function authorize(body) {
 		try {
-			console.log('Starting token exchange...');
-			const response = await fetch(`${API_URL}/api/token`, {
+			console.log(`Starting ${body?.refresh_token ? 'reauth' : 'token'} exchange...`);
+			const response = await fetch(`${API_URL}/api/spotify/auth`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ code })
+				body: JSON.stringify(body)
 			});
 
 			const data = await response.json();
@@ -48,21 +53,30 @@ const useSpotifyAuthStore = create((set, get) => {
 				throw new Error(data.details || 'Token exchange failed');
 			}
 
-			console.log('Token exchange successful!');
+			console.log(`${body?.refresh_token ? 'Reauth' : 'Token'} exchange successful!`);
 
 			const api = SpotifyApi.withAccessToken(import.meta.env.VITE_SPOTIFY_CLIENT_ID, data);
-
 			const userProfile = await api.currentUser.profile();
+			const expirationDate = new Date().getTime() + (data.expires_in - 300) * 1000;
 
-			set({ user: userProfile, accessToken: data.access_token, isLoading: false });
+			set({
+				user: userProfile,
+				accessToken: data.access_token,
+				isLoading: false
+			});
 
-			if (data.refresh_token) {
-				localStorage.setItem('spotify_refresh_token', data.refresh_token);
-			}
+			setCookie('spotifyAccessToken', JSON.stringify({ accessToken: data.access_token, expirationDate }), expirationDate);
+			if (data.refresh_token) setCookie('spotifyRefreshToken', data.refresh_token);
+			handleExpiration(expirationDate, data.refresh_token || getCookie('refresh_token'));
 		} catch (error) {
 			console.error('Auth error:', error);
 			set({ error: error, isLoading: false });
 		}
+	}
+
+	function handleExpiration(expirationDate, refreshToken) {
+		const timeToExp = expirationDate - new Date().getTime();
+		setTimeout(() => authorize({ refresh_token: refreshToken }), timeToExp);
 	}
 
 	const login = () => {
@@ -75,7 +89,17 @@ const useSpotifyAuthStore = create((set, get) => {
 		// Add any other cleanup
 	};
 
-	return { accessToken: undefined, user: undefined, isLoading: undefined, error: undefined, login, logout };
+	return {
+		accessToken: cookieToken,
+		hasRefreshToken: !!refreshToken,
+		expirationDate: undefined,
+		refreshToken: undefined,
+		user: undefined,
+		isLoading: undefined,
+		error: undefined,
+		login,
+		logout
+	};
 });
 
 export default useSpotifyAuthStore;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Search as SearchIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useSpotifyApi } from '../../hooks/use-spotify-api';
+import { useSpotifyApi } from '../../hooks/useSpotifyApi';
 import { debounce } from 'lodash';
 
 export function Search({ onTrackSelect }) {
@@ -12,23 +12,20 @@ export function Search({ onTrackSelect }) {
 
 	const handleInputChange = e => setQuery(e.target.value);
 
-	const performSearch = useCallback(
-		async searchQuery => {
-			if (!searchQuery.trim()) {
-				setResults([]);
-				return;
-			}
+	const performSearch = async searchQuery => {
+		if (!searchQuery.trim()) {
+			setResults([]);
+			return;
+		}
 
-			setIsSearching(true); // Start the spinner
-			try {
-				const tracks = await searchTracks(searchQuery);
-				setResults(tracks || []);
-			} finally {
-				setIsSearching(false); // Stop the spinner after results load
-			}
-		},
-		[searchTracks]
-	);
+		setIsSearching(true); // Start the spinner
+		try {
+			const tracks = await searchTracks(searchQuery);
+			setResults(tracks || []);
+		} finally {
+			setIsSearching(false); // Stop the spinner after results load
+		}
+	};
 
 	const debouncedSearch = useRef(
 		debounce(value => {

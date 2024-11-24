@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
 
 export function useSpotifyApi() {
 	const accessToken = useSpotifyAuthStore(state => state.accessToken);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
+
+	const accessTokenRef = useRef(accessToken);
+
+	useEffect(() => {
+		accessTokenRef.current = accessToken;
+	}, [accessToken]);
 
 	const playTrack = async (uri, deviceId) => {
 		if (!uri || !deviceId) return;
@@ -13,7 +19,7 @@ export function useSpotifyApi() {
 			await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
 				method: 'PUT',
 				headers: {
-					'Authorization': `Bearer ${accessToken}`,
+					'Authorization': `Bearer ${accessTokenRef.current}`,
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
@@ -26,7 +32,7 @@ export function useSpotifyApi() {
 	};
 
 	const searchTracks = async query => {
-		if (!query.trim() || !accessToken) return [];
+		if (!query.trim() || !accessTokenRef.current) return [];
 
 		setLoading(true);
 		setError(null);
@@ -36,7 +42,7 @@ export function useSpotifyApi() {
 
 			const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`, {
 				headers: {
-					'Authorization': `Bearer ${accessToken}`,
+					'Authorization': `Bearer ${accessTokenRef.current}`,
 					'Content-Type': 'application/json'
 				}
 			});

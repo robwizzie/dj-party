@@ -2,7 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
 
 export function AuthGuard({ children }) {
-	const { accessToken, isLoading } = useSpotifyAuthStore();
+	const { accessToken, hasRefreshToken, isLoading } = useSpotifyAuthStore();
 	const location = useLocation();
 
 	if (isLoading) {
@@ -13,7 +13,7 @@ export function AuthGuard({ children }) {
 		);
 	}
 
-	if (!accessToken) {
+	if (!accessToken && !hasRefreshToken) {
 		return <Navigate to="/" state={{ from: location }} replace />;
 	}
 
