@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route } 
 import { AuthGuard } from './components/auth-guard';
 import { Layout } from './components/layout';
 import { Home } from './pages/home';
-import { PartyRoom } from './pages/party-room';
+import { PartyRoom } from './pages/PartyRoom';
 import { AuthCallback } from './pages/auth-callback';
 
 const router = createBrowserRouter(

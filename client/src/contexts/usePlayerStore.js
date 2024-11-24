@@ -192,7 +192,7 @@ const usePlayerStore = create((set, get) => {
 		}
 	}
 
-	const seek = async position => {
+	async function seek(position) {
 		if (!player) {
 			console.error('Player not ready');
 			return;
@@ -204,7 +204,7 @@ const usePlayerStore = create((set, get) => {
 		} catch (error) {
 			console.error('Error seeking:', error);
 		}
-	};
+	}
 
 	async function getPosition() {
 		const state = await player.getCurrentState();

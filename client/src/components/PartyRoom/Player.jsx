@@ -207,31 +207,41 @@ function ProgressBar() {
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const isPaused = usePlayerStore(state => state.isPaused);
 	const getPosition = usePlayerStore(state => state.getPosition);
+	const { seek } = usePlayerStore(state => state.controls);
+
+	const [isDragging, setIsDragging] = useState(false);
 
 	const [progress, setProgress] = useState(0);
 
 	useEffect(() => {
-		if (isPaused) return;
-		const interval = setInterval(() => getPosition().then(setProgress), 1000);
+		if (isPaused || isDragging) return;
+		const interval = setInterval(() => {
+			getPosition().then(setProgress);
+		}, 1000);
 
 		return () => clearInterval(interval);
-	}, [isPaused, currentTrack?.id]);
+	}, [isPaused, currentTrack?.id, isDragging]);
 
-	function handleSeek() {}
-	function setIsDragging() {}
+	async function handleSeek(value) {
+		setIsDragging(true);
+		const position = value[0];
+		setProgress(position);
+	}
+
+	async function onDragEnd() {
+		setIsDragging(false);
+		seek(progress);
+	}
 
 	return (
 		<div className="space-y-2">
 			<Slider.Root
 				className="relative flex items-center select-none touch-none w-full h-5"
 				value={[progress]}
-				max={currentTrack?.duration_ms || 100}
+				max={currentTrack?.duration_ms ?? 100}
 				step={1000}
 				onValueChange={handleSeek}
-				onMouseDown={() => setIsDragging(true)}
-				onMouseUp={() => setIsDragging(false)}
-				onTouchStart={() => setIsDragging(true)}
-				onTouchEnd={() => setIsDragging(false)}
+				onValueCommit={onDragEnd}
 				aria-label="Playback Progress"
 			>
 				<Slider.Track className="bg-white/20 relative grow rounded-full h-1">
@@ -244,7 +254,7 @@ function ProgressBar() {
 			</Slider.Root>
 			<div className="flex justify-between text-xs text-white/60">
 				<span>{formatTime(progress)}</span>
-				<span>{formatTime(currentTrack?.duration_ms)}</span>
+				<span>{formatTime(currentTrack?.duration_ms ?? 0)}</span>
 			</div>
 		</div>
 	);

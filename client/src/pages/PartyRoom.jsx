@@ -1,8 +1,8 @@
 // src/pages/party-room.jsx
-import { RoomHeader } from '../components/party-room/room-header';
-import { Queue } from '../components/party-room/queue';
-import { Player } from '../components/party-room/player';
-import { Search } from '../components/party-room/search';
+import { RoomHeader } from '../components/PartyRoom/RoomHeader';
+import { Queue } from '../components/PartyRoom/Queue';
+import { Player } from '../components/PartyRoom/Player';
+import { Search } from '../components/PartyRoom/Search';
 import { useParams } from 'react-router-dom';
 import { useQueue } from '../contexts/queue-context';
 import { QueueProvider } from '../contexts/queue-context';
