@@ -32,12 +32,6 @@ export function Player({ onTrackEnd }) {
 	// 	const intervalId = setInterval(handleTrackEnd, 1000);
 	// 	return () => clearInterval(intervalId);
 	// }, [playbackState, playNext]);
-	//
-	// const handleVolumeChange = async newVolume => {
-	// 	const volumeValue = newVolume[0];
-	// 	setVolumeState(volumeValue);
-	// 	await setVolume(volumeValue);
-	// };
 
 	return (
 		<div className="bg-spotify-gray rounded-lg p-6">
