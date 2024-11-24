@@ -3,7 +3,6 @@ import useSpotifyAuthStore from './useSpotifyAuthStore';
 
 const usePlayerStore = create((set, get) => {
 	let accessToken = useSpotifyAuthStore.getState().accessToken;
-	console.log('initial at: ', accessToken);
 
 	let player;
 
@@ -184,6 +183,7 @@ const usePlayerStore = create((set, get) => {
 
 		try {
 			const volume = Math.max(0, Math.min(1, value));
+			set({ volume });
 			await player.setVolume(volume);
 
 			updatePlaybackState(200);
@@ -219,6 +219,7 @@ const usePlayerStore = create((set, get) => {
 		isReady: false,
 		deviceId: undefined,
 		currentTrack: undefined,
+		volume: 0.5,
 		getPosition,
 		controls: {
 			togglePlay,
