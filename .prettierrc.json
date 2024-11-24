@@ -1,0 +1,10 @@
+{
+	"tabWidth": 4,
+	"arrowParens": "avoid",
+	"htmlWhitespaceSensitivity": "strict",
+	"quoteProps": "consistent",
+	"singleQuote": true,
+	"trailingComma": "none",
+	"useTabs": true,
+	"printWidth": 130
+}
