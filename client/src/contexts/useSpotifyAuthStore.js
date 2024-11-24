@@ -91,6 +91,7 @@ const useSpotifyAuthStore = create((set, get) => {
 
 	return {
 		accessToken: cookieToken,
+		hasRefreshToken: !!refreshToken,
 		expirationDate: undefined,
 		refreshToken: undefined,
 		user: undefined,
