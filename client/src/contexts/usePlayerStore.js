@@ -200,6 +200,7 @@ const usePlayerStore = create((set, get) => {
 
 		try {
 			await player.seek(position);
+			if (get().isPaused) togglePlay();
 			updatePlaybackState(200);
 		} catch (error) {
 			console.error('Error seeking:', error);
