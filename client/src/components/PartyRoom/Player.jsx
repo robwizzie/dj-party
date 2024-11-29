@@ -1,11 +1,8 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Play, Pause, SkipForward, Music2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useSpotifyPlayer } from '../../hooks/use-spotify-player';
-import { useQueue } from '../../contexts/queue-context';
 import * as Slider from '@radix-ui/react-slider';
 import usePlayerStore from '../../contexts/usePlayerStore';
-import useSpotifyAuthStore from '../../contexts/useSpotifyAuthStore';
 
 const formatTime = ms => {
 	const seconds = Math.floor((ms / 1000) % 60);
@@ -13,10 +10,8 @@ const formatTime = ms => {
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export function Player({ onTrackEnd }) {
+export function Player() {
 	const { isPaused } = usePlayerStore(state => state);
-
-	const { currentTrack: queuedTrack, playNext } = useQueue();
 
 	// // Handle track ending
 	// useEffect(() => {

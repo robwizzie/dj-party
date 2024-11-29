@@ -1,9 +1,15 @@
 import { Music, User, X } from 'lucide-react';
-import { useQueue } from '../../contexts/queue-context';
 import { Button } from '../ui/button';
+import usePlayerStore from '../../contexts/usePlayerStore';
+import { useMemo } from 'react';
 
 export function Queue() {
-	const { queue, currentTrack, removeFromQueue } = useQueue();
+	const playbackTimeline = usePlayerStore(state => state.playbackTimeline);
+	const currentSongIndex = usePlayerStore(state => state.index);
+	const currentTrack = usePlayerStore(state => state.currentTrack);
+	const removeFromQueue = usePlayerStore(state => state.removeFromQueue);
+
+	const queue = useMemo(() => playbackTimeline.slice(currentSongIndex + 1), [playbackTimeline, currentSongIndex]);
 
 	return (
 		<div className="bg-spotify-gray rounded-lg p-4">
@@ -11,37 +17,41 @@ export function Queue() {
 			<div className="space-y-2">
 				{currentTrack && (
 					<div className="flex items-center space-x-4 p-3 rounded-md bg-spotify-green/20">
-						<img src={currentTrack.albumImage} alt={currentTrack.title} className="w-12 h-12 rounded-md" />
+						<img
+							src={currentTrack.album.images[0].url}
+							alt={currentTrack.album.name}
+							className="w-12 h-12 rounded-md"
+						/>
 						<div className="flex-1 min-w-0">
-							<p className="font-medium truncate text-spotify-green">{currentTrack.title}</p>
-							<p className="text-sm text-white/60 truncate">{currentTrack.artist}</p>
+							<p className="font-medium truncate text-spotify-green">{currentTrack.name}</p>
+							<p className="text-sm text-white/60 truncate">{currentTrack.artists[0].name}</p>
 						</div>
-						<div className="flex items-center space-x-2 text-sm text-white/60">
-							<User className="w-4 h-4" />
-							<span>{currentTrack.user}</span>
-						</div>
+						{/* <div className="flex items-center space-x-2 text-sm text-white/60"> */}
+						{/* 	<User className="w-4 h-4" /> */}
+						{/* 	<span>{currentTrack.user}</span> */}
+						{/* </div> */}
 					</div>
 				)}
 
-				{queue.map(item => (
+				{queue.map((item, i) => (
 					<div
 						key={item.id}
 						className="flex items-center space-x-4 p-3 rounded-md bg-black/20 hover:bg-black/30 transition-colors"
 					>
-						<img src={item.albumImage} alt={item.title} className="w-12 h-12 rounded-md" />
+						<img src={item.album.images[0].url} alt={item.album.name} className="w-12 h-12 rounded-md" />
 						<div className="flex-1 min-w-0">
-							<p className="font-medium truncate">{item.title}</p>
-							<p className="text-sm text-white/60 truncate">{item.artist}</p>
+							<p className="font-medium truncate">{item.name}</p>
+							<p className="text-sm text-white/60 truncate">{item.artists[0].name}</p>
 						</div>
 						<div className="flex items-center space-x-2">
-							<div className="flex items-center space-x-2 text-sm text-white/60">
-								<User className="w-4 h-4" />
-								<span>{item.user}</span>
-							</div>
+							{/* <div className="flex items-center space-x-2 text-sm text-white/60"> */}
+							{/* 	<User className="w-4 h-4" /> */}
+							{/* 	<span>{item.user}</span> */}
+							{/* </div> */}
 							<Button
 								variant="ghost"
 								size="sm"
-								onClick={() => removeFromQueue(item.id)}
+								onClick={() => removeFromQueue(i + currentSongIndex)}
 								className="text-white/60 hover:text-white"
 							>
 								<X className="w-4 h-4" />
