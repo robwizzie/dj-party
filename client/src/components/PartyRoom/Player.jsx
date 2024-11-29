@@ -102,11 +102,11 @@ function ProgressBar() {
 		);
 
 		return () => clearInterval(interval);
-	}, [isPaused, currentTrack?.id, isDragging, progress]);
+	}, [isPaused, currentTrack?.id, isDragging, progress, getPosition]);
 
 	useEffect(() => {
 		getPosition().then(setProgress);
-	}, [currentTrack?.id]);
+	}, [currentTrack?.id, getPosition]);
 
 	async function handleSeek(value) {
 		setIsDragging(true);
