@@ -101,6 +101,10 @@ function ProgressBar() {
 		return () => clearInterval(interval);
 	}, [isPaused, currentTrack?.id, isDragging]);
 
+	useEffect(() => {
+		getPosition().then(setProgress);
+	}, [currentTrack?.id]);
+
 	async function handleSeek(value) {
 		setIsDragging(true);
 		const position = value[0];
