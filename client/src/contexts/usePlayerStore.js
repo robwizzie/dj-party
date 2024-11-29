@@ -126,21 +126,47 @@ const usePlayerStore = create((set, get) => {
 		}
 	}
 
-	async function nextTrack() {
+	async function next() {
 		if (!player) {
 			console.error('Player not ready');
 			return;
 		}
 
 		try {
-			await player.nextTrack();
-			updatePlaybackState(200);
+			const { index, playbackTimeline } = get();
+			if (index >= playbackTimeline.length) {
+				set({ index: playbackTimeline.length }); // make sure the index doesn't overshoot
+				return;
+			}
+
+			set({ index: index + 1 });
+			startTrack();
 		} catch (error) {
 			console.error('Error skipping track:', error);
 		}
 	}
 
-	async function startPlayback(uris) {
+	async function back() {
+		if (!player) {
+			console.error('Player not ready');
+			return;
+		}
+
+		try {
+			const { index } = get();
+
+			if (index === 0 || (await getPosition()) > 10000) {
+				seek(0);
+			} else {
+				set({ index: index - 1 });
+				startTrack();
+			}
+		} catch (error) {
+			console.error('Error skipping track:', error);
+		}
+	}
+
+	async function startTrack(uris) {
 		const deviceId = get().deviceId;
 
 		if (!player || !deviceId) {
@@ -149,6 +175,13 @@ const usePlayerStore = create((set, get) => {
 		}
 
 		try {
+			const { playbackTimeline, index } = get();
+			if (!uris || !uris.length) {
+				const nextTrack = playbackTimeline[index]?.uri;
+				if (!nextTrack) return;
+				uris = [nextTrack];
+			}
+
 			console.log('Starting playback:', { deviceId, uris });
 
 			await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
@@ -208,8 +241,27 @@ const usePlayerStore = create((set, get) => {
 	}
 
 	async function getPosition() {
+		if (!player) {
+			console.error('Player not ready');
+			return;
+		}
+
 		const state = await player.getCurrentState();
 		return state?.position;
+	}
+
+	function addToQueue(track) {
+		const { playbackTimeline, index, isPaused } = get();
+		const updatedTimeline = [...playbackTimeline, track];
+		set({ playbackTimeline: updatedTimeline });
+
+		if (index === playbackTimeline.length && isPaused) startTrack();
+	}
+
+	function removeFromQueue(trackIndex = undefined) {
+		const { index, playbackTimeline } = get();
+		if (trackIndex === undefined || trackIndex <= index) return;
+		set({ playbackTimeline: [...playbackTimeline.slice(0, trackIndex), ...playbackTimeline.slice(trackIndex + 1)] });
 	}
 
 	return {
@@ -220,14 +272,19 @@ const usePlayerStore = create((set, get) => {
 		isReady: false,
 		deviceId: undefined,
 		currentTrack: undefined,
+		playbackTimeline: [],
+		index: 0,
 		volume: 0.5,
 		getPosition,
+		addToQueue,
+		removeFromQueue,
 		controls: {
 			togglePlay,
-			nextTrack,
-			startPlayback,
+			startTrack,
 			setVolume,
-			seek
+			seek,
+			next,
+			back
 		}
 	};
 });

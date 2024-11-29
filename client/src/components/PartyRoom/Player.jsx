@@ -1,11 +1,8 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Play, Pause, SkipForward, Music2, Volume2, VolumeX } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Play, Pause, SkipForward, Music2, Volume2, VolumeX, SkipBack } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useSpotifyPlayer } from '../../hooks/use-spotify-player';
-import { useQueue } from '../../contexts/queue-context';
 import * as Slider from '@radix-ui/react-slider';
 import usePlayerStore from '../../contexts/usePlayerStore';
-import useSpotifyAuthStore from '../../contexts/useSpotifyAuthStore';
 
 const formatTime = ms => {
 	const seconds = Math.floor((ms / 1000) % 60);
@@ -13,10 +10,8 @@ const formatTime = ms => {
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export function Player({ onTrackEnd }) {
+export function Player() {
 	const { isPaused } = usePlayerStore(state => state);
-
-	const { currentTrack: queuedTrack, playNext } = useQueue();
 
 	// // Handle track ending
 	// useEffect(() => {
@@ -98,13 +93,24 @@ function ProgressBar() {
 	const [progress, setProgress] = useState(0);
 
 	useEffect(() => {
-		if (isPaused || isDragging) return;
-		const interval = setInterval(() => {
+		if (isDragging) return;
+		if (isPaused) {
 			getPosition().then(setProgress);
-		}, 1000);
+			return;
+		}
+		const interval = setInterval(
+			() => {
+				getPosition().then(setProgress);
+			},
+			1010 - (progress % 1000) // Correct for timing offset
+		);
 
 		return () => clearInterval(interval);
-	}, [isPaused, currentTrack?.id, isDragging]);
+	}, [isPaused, currentTrack?.id, isDragging, progress, getPosition]);
+
+	useEffect(() => {
+		getPosition().then(setProgress);
+	}, [currentTrack?.id, getPosition]);
 
 	async function handleSeek(value) {
 		setIsDragging(true);
@@ -148,11 +154,20 @@ function PlaybackControls() {
 	const isPaused = usePlayerStore(state => state.isPaused);
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const volume = usePlayerStore(state => state.volume);
-	const { togglePlay, nextTrack, startPlayback, setVolume } = usePlayerStore(state => state.controls);
+	const { togglePlay, next: nextTrack, back: backTrack, setVolume } = usePlayerStore(state => state.controls);
 
 	return (
 		<div className="flex flex-col space-y-4">
 			<div className="flex items-center justify-center space-x-4">
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={backTrack}
+					disabled={!currentTrack}
+					className="hover:bg-white/10 transition-colors duration-200"
+				>
+					<SkipBack className="w-6 h-6" />
+				</Button>
 				<Button
 					variant="ghost"
 					size="sm"

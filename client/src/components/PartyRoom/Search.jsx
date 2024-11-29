@@ -3,12 +3,14 @@ import { Search as SearchIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useSpotifyApi } from '../../hooks/useSpotifyApi';
 import { debounce } from 'lodash';
+import usePlayerStore from '../../contexts/usePlayerStore';
 
-export function Search({ onTrackSelect }) {
+export function Search() {
 	const [query, setQuery] = useState('');
 	const [isSearching, setIsSearching] = useState(false);
 	const [results, setResults] = useState([]);
 	const { searchTracks } = useSpotifyApi();
+	const addToQueue = usePlayerStore(state => state.addToQueue);
 
 	const handleInputChange = e => setQuery(e.target.value);
 
@@ -81,7 +83,7 @@ export function Search({ onTrackSelect }) {
 									<p className="font-medium truncate">{track.name}</p>
 									<p className="text-sm text-white/60 truncate">{track.artists.map(a => a.name).join(', ')}</p>
 								</div>
-								<Button variant="ghost" size="sm" onClick={() => onTrackSelect(track)}>
+								<Button variant="ghost" size="sm" onClick={() => addToQueue(track)}>
 									Add to Queue
 								</Button>
 							</div>
