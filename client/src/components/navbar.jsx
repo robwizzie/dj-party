@@ -9,8 +9,8 @@ export function Navbar() {
 	const { user, logout, accessToken } = useSpotifyAuthStore();
 
 	const handleCreateParty = () => {
-		const roomId = Math.random().toString(36).substring(2, 8);
-		navigate(`/party/${roomId}`);
+		const partyId = Math.random().toString(36).substring(2, 8);
+		navigate(`/party/${partyId}`);
 	};
 
 	return (

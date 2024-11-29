@@ -1,18 +1,36 @@
 // src/pages/party-room.jsx
-import { RoomHeader } from '../components/PartyRoom/RoomHeader';
+import { PartyHeader } from '../components/PartyRoom/PartyHeader';
 import { Queue } from '../components/PartyRoom/Queue';
 import { Player } from '../components/PartyRoom/Player';
 import { Search } from '../components/PartyRoom/Search';
 import { useParams } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
+import { useEffect } from 'react';
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3001');
 
 function PartyRoomContent() {
-	const { roomId } = useParams();
+	const { partyId } = useParams();
 	const user = useSpotifyAuthStore(store => store.user);
+
+	useEffect(() => {
+		socket.emit('join-party', partyId);
+
+		socket.on('receive-message', data => {
+			console.log(data);
+		});
+
+		window.sendMessage = function (message) {
+			socket.emit('send-message', { partyId, message });
+		};
+
+		return () => socket.off('receive-message');
+	}, [partyId]);
 
 	return (
 		<div className="space-y-6">
-			<RoomHeader roomId={roomId} host={user?.display_name} />
+			<RoomHeader partyId={partyId} host={user?.display_name} />
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<div className="lg:col-span-2 space-y-6">
 					<Player />

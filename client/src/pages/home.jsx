@@ -10,10 +10,9 @@ export function Home() {
 		if (!accessToken) {
 			login();
 		} else {
-			// Generate a random room ID for now
-			const roomId = Math.random().toString(36).substring(2, 8);
-			console.log(roomId);
-			navigate(`/party/${roomId}`);
+			// Generate a random party ID for now
+			const partyId = Math.random().toString(36).substring(2, 8);
+			navigate(`/party/${partyId}`);
 		}
 	};
 
