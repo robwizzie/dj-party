@@ -94,12 +94,15 @@ function ProgressBar() {
 
 	useEffect(() => {
 		if (isPaused || isDragging) return;
-		const interval = setInterval(() => {
-			getPosition().then(setProgress);
-		}, 1000);
+		const interval = setInterval(
+			() => {
+				getPosition().then(setProgress);
+			},
+			1010 - (progress % 1000) // Correct for timing offset
+		);
 
 		return () => clearInterval(interval);
-	}, [isPaused, currentTrack?.id, isDragging]);
+	}, [isPaused, currentTrack?.id, isDragging, progress]);
 
 	useEffect(() => {
 		getPosition().then(setProgress);

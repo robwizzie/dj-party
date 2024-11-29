@@ -153,10 +153,7 @@ const usePlayerStore = create((set, get) => {
 		}
 
 		try {
-			const { index, queue } = get();
-			if (index === 0 && !queue.length) {
-				return;
-			}
+			const { index } = get();
 
 			if (index === 0 || (await getPosition()) > 10000) {
 				seek(0);
