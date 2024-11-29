@@ -241,6 +241,11 @@ const usePlayerStore = create((set, get) => {
 	}
 
 	async function getPosition() {
+		if (!player) {
+			console.error('Player not ready');
+			return;
+		}
+
 		const state = await player.getCurrentState();
 		return state?.position;
 	}

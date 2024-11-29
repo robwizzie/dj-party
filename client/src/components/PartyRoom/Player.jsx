@@ -93,7 +93,11 @@ function ProgressBar() {
 	const [progress, setProgress] = useState(0);
 
 	useEffect(() => {
-		if (isPaused || isDragging) return;
+		if (isDragging) return;
+		if (isPaused) {
+			getPosition().then(setProgress);
+			return;
+		}
 		const interval = setInterval(
 			() => {
 				getPosition().then(setProgress);
