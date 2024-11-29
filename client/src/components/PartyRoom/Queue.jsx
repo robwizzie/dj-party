@@ -51,7 +51,7 @@ export function Queue() {
 							<Button
 								variant="ghost"
 								size="sm"
-								onClick={() => removeFromQueue(i + currentSongIndex)}
+								onClick={() => removeFromQueue(i + currentSongIndex + 1)}
 								className="text-white/60 hover:text-white"
 							>
 								<X className="w-4 h-4" />
