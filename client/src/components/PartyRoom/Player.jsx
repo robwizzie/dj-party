@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Play, Pause, SkipForward, Music2, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipForward, Music2, Volume2, VolumeX, SkipBack } from 'lucide-react';
 import { Button } from '../ui/button';
 import * as Slider from '@radix-ui/react-slider';
 import usePlayerStore from '../../contexts/usePlayerStore';
@@ -143,11 +143,20 @@ function PlaybackControls() {
 	const isPaused = usePlayerStore(state => state.isPaused);
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const volume = usePlayerStore(state => state.volume);
-	const { togglePlay, nextTrack, startPlayback, setVolume } = usePlayerStore(state => state.controls);
+	const { togglePlay, next: nextTrack, back: backTrack, setVolume } = usePlayerStore(state => state.controls);
 
 	return (
 		<div className="flex flex-col space-y-4">
 			<div className="flex items-center justify-center space-x-4">
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={backTrack}
+					disabled={!currentTrack}
+					className="hover:bg-white/10 transition-colors duration-200"
+				>
+					<SkipBack className="w-6 h-6" />
+				</Button>
 				<Button
 					variant="ghost"
 					size="sm"

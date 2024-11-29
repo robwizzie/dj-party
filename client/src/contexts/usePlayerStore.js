@@ -133,9 +133,9 @@ const usePlayerStore = create((set, get) => {
 		}
 
 		try {
-			const { index, queue } = get();
-			if (index >= queue.length) {
-				set({ index: queue.length }); // make sure the index doesn't overshoot
+			const { index, playbackTimeline } = get();
+			if (index >= playbackTimeline.length) {
+				set({ index: playbackTimeline.length }); // make sure the index doesn't overshoot
 				return;
 			}
 
@@ -158,10 +158,10 @@ const usePlayerStore = create((set, get) => {
 				return;
 			}
 
-			if (index === 0 || (await getPosition()) > 10) {
+			if (index === 0 || (await getPosition()) > 10000) {
 				seek(0);
 			} else {
-				set({ index: index + 1 });
+				set({ index: index - 1 });
 				startTrack();
 			}
 		} catch (error) {
