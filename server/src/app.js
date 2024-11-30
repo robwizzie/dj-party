@@ -3,6 +3,7 @@ import routes from './routes/index.js';
 import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
+import socketHandlers from './sockets/index.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -10,8 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: 'http://localhost:5173',
-		methods: ['GET', 'POST']
+		origin: '*'
 	}
 });
 
@@ -29,24 +29,7 @@ app.use((req, res, next) => {
 	res.status(404).send('Not Found');
 });
 
-io.on('connection', socket => {
-	console.log('User connected:', socket.id);
-
-	socket.on('join-party', partyId => {
-		socket.join(partyId);
-		socket.to(partyId).emit('user-connected', socket.id);
-	});
-
-	socket.on('send-message', ({ partyId, message }) => {
-		console.log(partyId, message);
-		socket.to(partyId).emit('receive-message', { id: socket.id, message });
-	});
-
-	socket.on('disconnect', () => {
-		console.log('User disconnected:', socket.id);
-		io.emit('user-dosconnected', socket.id);
-	});
-});
+socketHandlers(io);
 
 server.listen(PORT, () => {
 	console.log(`Server running on port: ${PORT}`);
