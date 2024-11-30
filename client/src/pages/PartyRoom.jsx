@@ -6,29 +6,22 @@ import { Search } from '../components/PartyRoom/Search';
 import { useParams } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
 import { useEffect } from 'react';
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:3001');
+import usePartyStore from '../contexts/usePartyStore';
 
 function PartyRoomContent() {
-	const { partyId } = useParams();
+	const { partyId: urlPartyId } = useParams();
 	const user = useSpotifyAuthStore(store => store.user);
+	const partyId = usePartyStore(state => state.partyId);
+	const joinParty = usePartyStore(state => state.joinParty);
+	const status = usePartyStore(state => state.status);
 
 	useEffect(() => {
-		socket.emit('join-party', partyId);
+		if (partyId === urlPartyId || status === 'joining') return;
 
-		socket.on('receive-message', data => {
-			console.log(data);
-		});
+		joinParty(urlPartyId);
+	}, [urlPartyId]);
 
-		window.sendMessage = function (message) {
-			socket.emit('send-message', { partyId, message });
-		};
-
-		return () => socket.off('receive-message');
-	}, [partyId]);
-
-	return (
+	return partyId ? (
 		<div className="space-y-6">
 			<PartyHeader partyId={partyId} host={user?.display_name} />
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -43,6 +36,11 @@ function PartyRoomContent() {
 					<Queue />
 				</div>
 			</div>
+		</div>
+	) : (
+		<div>
+			{/** TODO add better loading state*/}
+			{status}
 		</div>
 	);
 }
