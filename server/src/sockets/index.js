@@ -45,17 +45,18 @@ function partyConnectionSocket(io, socket) {
 			return;
 		}
 
-		hostSocket.emit('join-request', { user: socket.id }, ({ isAccepted, song }) => {
-			if (!isAccepted) {
-				callback({ error: 'Access denied by host' });
-				return;
-			}
+		// hostSocket.emit('join-request', { user: socket.id }, ({ isAccepted, song }) => {
+		// 	if (!isAccepted) {
+		// 		callback({ error: 'Access denied by host' });
+		// 		return;
+		// 	}
+		//
+		// });
 
-			party.users.push(socket.id);
-			socket.to(partyId).emit('user-joined', { user: socket.id });
-			socket.join(partyId);
-			callback({ users: party.users });
-		});
+		party.users.push(socket.id);
+		socket.to(partyId).emit('user-joined', { user: socket.id });
+		socket.join(partyId);
+		callback({ users: party.users });
 	});
 
 	socket.on('disconnect', () => {
