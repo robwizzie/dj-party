@@ -11,7 +11,7 @@ const router = createBrowserRouter(
 			<Route path="/" element={<Home />} />
 			<Route path="/callback" element={<AuthCallback />} />
 			<Route
-				path="/party/:roomId"
+				path="/party/:partyId"
 				element={
 					<AuthGuard>
 						<PartyRoom />

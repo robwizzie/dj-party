@@ -1,18 +1,29 @@
 // src/pages/party-room.jsx
-import { RoomHeader } from '../components/PartyRoom/RoomHeader';
+import { PartyHeader } from '../components/PartyRoom/PartyHeader';
 import { Queue } from '../components/PartyRoom/Queue';
 import { Player } from '../components/PartyRoom/Player';
 import { Search } from '../components/PartyRoom/Search';
 import { useParams } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
+import { useEffect } from 'react';
+import usePartyStore from '../contexts/usePartyStore';
 
 function PartyRoomContent() {
-	const { roomId } = useParams();
+	const { partyId: urlPartyId } = useParams();
 	const user = useSpotifyAuthStore(store => store.user);
+	const partyId = usePartyStore(state => state.partyId);
+	const joinParty = usePartyStore(state => state.joinParty);
+	const status = usePartyStore(state => state.status);
 
-	return (
+	useEffect(() => {
+		if (partyId === urlPartyId || status === 'joining') return;
+
+		joinParty(urlPartyId);
+	}, [urlPartyId]);
+
+	return partyId ? (
 		<div className="space-y-6">
-			<RoomHeader roomId={roomId} host={user?.display_name} />
+			<PartyHeader partyId={partyId} host={user?.display_name} />
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<div className="lg:col-span-2 space-y-6">
 					<Player />
@@ -25,6 +36,11 @@ function PartyRoomContent() {
 					<Queue />
 				</div>
 			</div>
+		</div>
+	) : (
+		<div>
+			{/** TODO add better loading state*/}
+			{status}
 		</div>
 	);
 }
