@@ -39,11 +39,11 @@ function partyConnectionSocket(io, socket) {
 			return;
 		}
 
-		const hostSocket = io.sockets.sockets.get(party.host);
-		if (!hostSocket) {
-			callback({ error: `Host not found` });
-			return;
-		}
+		// const hostSocket = io.sockets.sockets.get(party.host);
+		// if (!hostSocket) {
+		// 	callback({ error: `Host not found` });
+		// 	return;
+		// }
 
 		// hostSocket.emit('join-request', { user: socket.id }, ({ isAccepted, song }) => {
 		// 	if (!isAccepted) {
