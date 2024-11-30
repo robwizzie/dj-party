@@ -26,14 +26,26 @@ const useSpotifyAuthStore = create((set, get) => {
 
 	const { accessToken: cookieToken, expirationDate } = JSON.parse(getCookie('spotifyAccessToken') || '{}');
 	const refreshToken = getCookie('spotifyRefreshToken');
-	if (cookieToken) handleExpiration(expirationDate, refreshToken);
-	else if (refreshToken) authorize({ refresh_token: refreshToken });
+	if (cookieToken) {
+		loadUser(cookieToken);
+		handleExpiration(expirationDate, refreshToken);
+	} else if (refreshToken) authorize({ refresh_token: refreshToken });
 
 	if (code) {
 		window.history.replaceState({}, document.title, window.location.pathname);
 		authorize({ code });
 	} else {
 		set({ isLoading: false });
+	}
+
+	async function loadUser(accessToken) {
+		const api = SpotifyApi.withAccessToken(import.meta.env.VITE_SPOTIFY_CLIENT_ID, { access_token: accessToken });
+		const userProfile = await api.currentUser.profile();
+		set({
+			user: userProfile,
+			accessToken,
+			isLoading: false
+		});
 	}
 
 	async function authorize(body) {
@@ -55,15 +67,8 @@ const useSpotifyAuthStore = create((set, get) => {
 
 			console.log(`${body?.refresh_token ? 'Reauth' : 'Token'} exchange successful!`);
 
-			const api = SpotifyApi.withAccessToken(import.meta.env.VITE_SPOTIFY_CLIENT_ID, data);
-			const userProfile = await api.currentUser.profile();
+			loadUser(data.access_token);
 			const expirationDate = new Date().getTime() + (data.expires_in - 300) * 1000;
-
-			set({
-				user: userProfile,
-				accessToken: data.access_token,
-				isLoading: false
-			});
 
 			setCookie('spotifyAccessToken', JSON.stringify({ accessToken: data.access_token, expirationDate }), expirationDate);
 			if (data.refresh_token) setCookie('spotifyRefreshToken', data.refresh_token);
