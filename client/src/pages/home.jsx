@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
 import usePartyStore from '../contexts/usePartyStore';
+import { JoinPartyDialog } from '../components/PartyRoom/JoinPartyDialog';
 
 export function Home() {
 	const { login, accessToken, user, isLoading, error } = useSpotifyAuthStore();
@@ -9,16 +11,27 @@ export function Home() {
 	const createParty = usePartyStore(state => state.createParty);
 	const joinParty = usePartyStore(state => state.joinParty);
 
+	const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
+	const [isJoining, setIsJoining] = useState(false);
+
 	async function handleCreateParty() {
 		const partyId = await createParty();
 		navigate(`/party/${partyId}`);
 	}
 
-	async function handleJoinParty() {
-		const partyId = prompt('Enter party ID:');
-		if (!partyId) return alert('Invalid party ID');
-		await joinParty(partyId);
-		setTimeout(() => navigate(`/party/${partyId}`), 100);
+	async function handleJoinParty(partyId) {
+		setIsJoining(true);
+		try {
+			await joinParty(partyId);
+			setTimeout(() => {
+				setIsJoinDialogOpen(false);
+				navigate(`/party/${partyId}`);
+			}, 100);
+		} catch (error) {
+			throw new Error('Unable to join party. Please check the party ID and try again.');
+		} finally {
+			setIsJoining(false);
+		}
 	}
 
 	return (
@@ -50,8 +63,7 @@ export function Home() {
 										onClick={handleCreateParty}
 										size="lg"
 										className="w-full sm:w-auto px-8 py-3"
-										disabled={isLoading}
-									>
+										disabled={isLoading}>
 										{isLoading ? (
 											<div className="flex items-center space-x-2">
 												<div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
@@ -63,19 +75,11 @@ export function Home() {
 									</Button>
 
 									<Button
-										onClick={handleJoinParty}
+										onClick={() => setIsJoinDialogOpen(true)}
 										size="lg"
 										className="w-full sm:w-auto px-8 py-3"
-										disabled={isLoading}
-									>
-										{isLoading ? (
-											<div className="flex items-center space-x-2">
-												<div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
-												<span>Connecting...</span>
-											</div>
-										) : (
-											'Join Existing Party'
-										)}
+										disabled={isLoading}>
+										Join Existing Party
 									</Button>
 								</div>
 							</div>
@@ -104,6 +108,13 @@ export function Home() {
 					)}
 				</div>
 			</div>
+
+			<JoinPartyDialog
+				open={isJoinDialogOpen}
+				onOpenChange={setIsJoinDialogOpen}
+				onJoin={handleJoinParty}
+				isLoading={isJoining}
+			/>
 		</div>
 	);
 }
