@@ -16,7 +16,7 @@ const usePartyStore = create((set, get) => {
 				return;
 			}
 
-			set({ status: 'joined', host: true, partyId, users });
+			set({ status: 'joined', isHost: true, partyId, users });
 			resolve(partyId);
 
 			console.log('Joined party: ', partyId);
@@ -63,7 +63,7 @@ const usePartyStore = create((set, get) => {
 		status: undefined,
 		error: undefined,
 		partyId: undefined,
-		host: false,
+		isHost: false,
 		users: [],
 		leaveParty,
 		createParty,
