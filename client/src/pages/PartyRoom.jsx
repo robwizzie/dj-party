@@ -1,8 +1,7 @@
-// src/pages/party-room.jsx
 import { PartyHeader } from '../components/PartyRoom/PartyHeader';
 import { Queue } from '../components/PartyRoom/Queue';
 import { Player } from '../components/PartyRoom/Player';
-import { Search } from '../components/PartyRoom/Search';
+import { Voting } from '../components/PartyRoom/Voting';
 import { useParams } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
 import { useEffect } from 'react';
@@ -17,7 +16,6 @@ function PartyRoomContent() {
 
 	useEffect(() => {
 		if (partyId === urlPartyId || status === 'joining') return;
-
 		joinParty(urlPartyId);
 	}, [urlPartyId]);
 
@@ -28,8 +26,7 @@ function PartyRoomContent() {
 				<div className="lg:col-span-2 space-y-6">
 					<Player />
 					<div className="bg-spotify-gray rounded-lg p-4">
-						<h2 className="text-xl font-semibold mb-4">Search Songs</h2>
-						<Search />
+						<Voting />
 					</div>
 				</div>
 				<div className="lg:col-span-1">

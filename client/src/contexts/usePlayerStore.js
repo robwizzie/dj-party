@@ -102,13 +102,27 @@ const usePlayerStore = create((set, get) => {
 		}
 
 		const state = await player.getCurrentState();
-		console.log(state);
 		if (state) {
 			const currentTrack = state.track_window?.current_track;
+			const isTrackEnd = state.paused && state.position === 0;
+
+			// Prevent multiple calls to next()
+			const { index, playbackTimeline, isAutoplaying } = get();
+
 			set({
 				isPaused: state.paused,
-				...(get().currentTrack?.id === currentTrack.id ? {} : { currentTrack })
+				...(get().currentTrack?.id === currentTrack?.id ? {} : { currentTrack }),
+				isAutoplaying: isTrackEnd ? true : false // Set autoplaying status
 			});
+
+			// Autoplay the next track if the current track ends
+			if (isTrackEnd && !isAutoplaying) {
+				if (index < playbackTimeline.length - 1) {
+					next(); // Play the next track in the queue
+				} else {
+					console.log('Queue is empty. No more tracks to play.');
+				}
+			}
 		}
 	}
 

@@ -43,7 +43,7 @@ export function Home() {
 										: 'Create a party, invite friends, and take turns being the DJ!'}
 								</p>
 
-								{error && <p className="text-red-500 bg-red-500/10 rounded-lg p-3">{error}</p>}
+								{error && <p className="text-red-500 bg-red-500/10 rounded-lg p-3">{error.message}</p>}
 
 								<div className="flex gap-2 mx-auto my-3 w-fit">
 									<Button
@@ -88,7 +88,7 @@ export function Home() {
 									: 'Create a party, invite friends, and take turns being the DJ!'}
 							</p>
 
-							{error && <p className="text-red-500 bg-red-500/10 rounded-lg p-3">{error}</p>}
+							{error && <p className="text-red-500 bg-red-500/10 rounded-lg p-3">{error.message}</p>}
 
 							<Button onClick={login} size="lg" className="w-full sm:w-auto px-8 py-3" disabled={isLoading}>
 								{isLoading ? (

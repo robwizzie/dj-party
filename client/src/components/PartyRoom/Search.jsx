@@ -4,8 +4,9 @@ import { Button } from '../ui/button';
 import { useSpotifyApi } from '../../hooks/useSpotifyApi';
 import { debounce } from 'lodash';
 import usePlayerStore from '../../contexts/usePlayerStore';
+import PropTypes from 'prop-types';
 
-export function Search() {
+export function Search({ onTrackSelect, customButton }) {
 	const [query, setQuery] = useState('');
 	const [isSearching, setIsSearching] = useState(false);
 	const [results, setResults] = useState([]);
@@ -20,12 +21,12 @@ export function Search() {
 			return;
 		}
 
-		setIsSearching(true); // Start the spinner
+		setIsSearching(true);
 		try {
 			const tracks = await searchTracks(searchQuery);
 			setResults(tracks || []);
 		} finally {
-			setIsSearching(false); // Stop the spinner after results load
+			setIsSearching(false);
 		}
 	};
 
@@ -39,11 +40,10 @@ export function Search() {
 		if (query) {
 			debouncedSearch(query);
 		} else {
-			setResults([]); // Clear results if query is empty
-			setIsSearching(false); // Ensure spinner stops
+			setResults([]);
+			setIsSearching(false);
 		}
 
-		// Cleanup debounce on unmount
 		return () => {
 			debouncedSearch.cancel();
 		};
@@ -76,16 +76,19 @@ export function Search() {
 						{results.map(track => (
 							<div
 								key={track.id}
-								className="flex items-center space-x-3 p-2 hover:bg-white/5 rounded-md transition-colors"
-							>
+								className="flex items-center space-x-3 p-2 hover:bg-white/5 rounded-md transition-colors">
 								<img src={track.album.images[2].url} alt={track.album.name} className="w-10 h-10 rounded" />
 								<div className="flex-1 min-w-0">
 									<p className="font-medium truncate">{track.name}</p>
 									<p className="text-sm text-white/60 truncate">{track.artists.map(a => a.name).join(', ')}</p>
 								</div>
-								<Button variant="ghost" size="sm" onClick={() => addToQueue(track)}>
-									Add to Queue
-								</Button>
+								{customButton ? (
+									customButton(track)
+								) : (
+									<Button variant="ghost" size="sm" onClick={() => addToQueue(track)}>
+										Add to Queue
+									</Button>
+								)}
 							</div>
 						))}
 					</div>
@@ -94,3 +97,8 @@ export function Search() {
 		</div>
 	);
 }
+
+Search.propTypes = {
+	onTrackSelect: PropTypes.func,
+	customButton: PropTypes.func
+};
