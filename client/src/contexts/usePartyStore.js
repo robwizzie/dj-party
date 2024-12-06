@@ -6,13 +6,14 @@ const usePartyStore = create((set, get) => {
 	const socket = io('http://localhost:3001');
 
 	function createParty() {
-		const { promise, resolve } = generatePromise();
+		const { promise, resolve, reject } = generatePromise();
 
 		set({ status: 'creating' });
 		socket.emit('create-party', ({ error, partyId, users }) => {
 			if (error) {
 				console.error(error);
 				set({ status: 'error', error });
+				reject(new Error(error));
 				return;
 			}
 
@@ -32,7 +33,7 @@ const usePartyStore = create((set, get) => {
 	}
 
 	async function joinParty(partyId) {
-		const { promise, resolve } = generatePromise();
+		const { promise, resolve, reject } = generatePromise();
 
 		if (get().partyId) await leaveParty();
 
@@ -42,6 +43,7 @@ const usePartyStore = create((set, get) => {
 			if (error) {
 				console.error(error);
 				set({ status: 'error', error });
+				reject(new Error(error)); // Reject the promise with the error
 				return;
 			}
 
@@ -57,7 +59,19 @@ const usePartyStore = create((set, get) => {
 		return promise;
 	}
 
-	async function leaveParty() {}
+	async function leaveParty() {
+		const { partyId } = get();
+		if (!partyId) return;
+
+		socket.emit('leave-party', { partyId });
+		set({
+			status: 'idle',
+			error: undefined,
+			partyId: undefined,
+			isHost: false,
+			users: []
+		});
+	}
 
 	return {
 		status: undefined,

@@ -3,14 +3,21 @@ import { Button } from './ui/button/index.js';
 import { Music2, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore.js';
+import usePartyStore from '../contexts/usePartyStore.js';
 
 export function Navbar() {
 	const navigate = useNavigate();
-	const { user, logout, accessToken } = useSpotifyAuthStore();
+	const { user, logout, accessToken, isLoading } = useSpotifyAuthStore();
+	const createParty = usePartyStore(state => state.createParty);
 
-	const handleCreateParty = () => {
-		const partyId = Math.random().toString(36).substring(2, 8);
-		navigate(`/party/${partyId}`);
+	const handleCreateParty = async () => {
+		try {
+			const partyId = await createParty();
+			navigate(`/party/${partyId}`);
+		} catch (error) {
+			console.error('Failed to create party:', error);
+			// Optionally show an error toast/notification here
+		}
 	};
 
 	return (
@@ -36,7 +43,16 @@ export function Navbar() {
 								<LogOut className="w-4 h-4 mr-2" />
 								<span className="hidden sm:inline">Logout</span>
 							</Button>
-							<Button onClick={handleCreateParty}>Create Party</Button>
+							<Button onClick={handleCreateParty} disabled={isLoading}>
+								{isLoading ? (
+									<div className="flex items-center space-x-2">
+										<div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
+										<span>Connecting...</span>
+									</div>
+								) : (
+									'Create New Party'
+								)}
+							</Button>
 						</>
 					) : (
 						<Button onClick={() => navigate('/')}>Connect Spotify</Button>
