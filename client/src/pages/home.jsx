@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
 import usePartyStore from '../contexts/usePartyStore';
 import { JoinPartyDialog } from '../components/PartyRoom/JoinPartyDialog';
+import { CreatePartyDialog } from '../components/PartyRoom/CreatePartyDialog';
 
 export function Home() {
 	const { login, accessToken, user, isLoading, error } = useSpotifyAuthStore();
@@ -12,11 +13,22 @@ export function Home() {
 	const joinParty = usePartyStore(state => state.joinParty);
 
 	const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
+	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [isJoining, setIsJoining] = useState(false);
+	const [isCreating, setIsCreating] = useState(false);
 
 	async function handleCreateParty() {
-		const partyId = await createParty();
-		navigate(`/party/${partyId}`);
+		setIsCreating(true);
+		try {
+			console.log('Creating party with settings:', usePartyStore.getState().settings);
+			const partyId = await createParty();
+			setIsCreateDialogOpen(false);
+			navigate(`/party/${partyId}`);
+		} catch (error) {
+			console.error('Failed to create party:', error);
+		} finally {
+			setIsCreating(false);
+		}
 	}
 
 	async function handleJoinParty(partyId) {
@@ -60,18 +72,11 @@ export function Home() {
 
 								<div className="flex gap-2 mx-auto my-3 w-fit">
 									<Button
-										onClick={handleCreateParty}
+										onClick={() => setIsCreateDialogOpen(true)}
 										size="lg"
 										className="w-full sm:w-auto px-8 py-3"
 										disabled={isLoading}>
-										{isLoading ? (
-											<div className="flex items-center space-x-2">
-												<div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
-												<span>Connecting...</span>
-											</div>
-										) : (
-											'Create New Party'
-										)}
+										Create New Party
 									</Button>
 
 									<Button
@@ -108,6 +113,13 @@ export function Home() {
 					)}
 				</div>
 			</div>
+
+			<CreatePartyDialog
+				open={isCreateDialogOpen}
+				onOpenChange={setIsCreateDialogOpen}
+				onCreateParty={handleCreateParty}
+				isLoading={isCreating}
+			/>
 
 			<JoinPartyDialog
 				open={isJoinDialogOpen}

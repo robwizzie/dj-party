@@ -2,13 +2,47 @@ import { io } from 'socket.io-client';
 import { create } from 'zustand';
 import { generatePromise } from '../utils/generatePromise';
 
+const DEFAULT_SETTINGS = {
+	password: {
+		enabled: false,
+		value: '',
+		mode: 'open' // 'open' | 'password' | 'approval'
+	},
+	skipThreshold: {
+		mode: 'percentage', // 'users' | 'percentage'
+		value: 50 // number of users or percentage
+	},
+	replayLimit: 3,
+	anonymousVoting: false,
+	allowKicking: true,
+	songLimit: 0, // 0 means unlimited
+	playbackMode: 'host' // 'host' | 'individual'
+};
+
 const usePartyStore = create((set, get) => {
 	const socket = io('http://localhost:3001');
+
+	function updateSettings(newSettings) {
+		const currentSettings = get().settings || DEFAULT_SETTINGS;
+		set({
+			settings: {
+				...currentSettings,
+				...newSettings
+			}
+		});
+	}
+
+	function initSettings() {
+		set({ settings: DEFAULT_SETTINGS, isHost: true });
+	}
 
 	function createParty() {
 		const { promise, resolve, reject } = generatePromise();
 
-		set({ status: 'creating' });
+		const currentSettings = get().settings;
+		console.log('Current settings before party creation:', currentSettings);
+
+		set({ status: 'creating', settings: currentSettings || DEFAULT_SETTINGS });
 		socket.emit('create-party', ({ error, partyId, users }) => {
 			if (error) {
 				console.error(error);
@@ -17,12 +51,24 @@ const usePartyStore = create((set, get) => {
 				return;
 			}
 
-			set({ status: 'joined', isHost: true, partyId, users });
+			set({
+				status: 'joined',
+				isHost: true,
+				partyId,
+				users,
+				settings: currentSettings || DEFAULT_SETTINGS
+			});
+			console.log('Party successfully created with settings:', get().settings);
 			resolve(partyId);
 
 			console.log('Joined party: ', partyId);
 			socket.on('join-request', async ({ user }, callback) => {
-				console.log(`User ${user} would like to join your party.`);
+				const { settings } = get();
+				if (settings.password.mode !== 'approval') {
+					callback({ isAccepted: true });
+					return;
+				}
+
 				if (confirm(`User ${user} would like to join your party.`)) {
 					callback({ isAccepted: true });
 				} else callback({ isAccepted: false });
@@ -32,27 +78,31 @@ const usePartyStore = create((set, get) => {
 		return promise;
 	}
 
-	async function joinParty(partyId) {
+	async function joinParty(partyId, password = '') {
 		const { promise, resolve, reject } = generatePromise();
 
 		if (get().partyId) await leaveParty();
 
 		set({ status: 'joining' });
 		console.log('Requesting to join party: ', partyId);
-		socket.emit('join-party', { partyId }, ({ error, users }) => {
+		socket.emit('join-party', { partyId, password }, ({ error, users, settings }) => {
 			if (error) {
 				console.error(error);
 				set({ status: 'error', error });
-				reject(new Error(error)); // Reject the promise with the error
+				reject(new Error(error));
 				return;
 			}
 
-			set({ partyId, status: 'joined', users });
+			set({ partyId, status: 'joined', users, settings });
 			resolve();
 
 			socket.on('user-joined', ({ user, users }) => {
 				console.log(`User ${user} has joined the party.`);
 				set({ users });
+			});
+
+			socket.on('settings-updated', ({ settings }) => {
+				set({ settings });
 			});
 		});
 
@@ -69,7 +119,8 @@ const usePartyStore = create((set, get) => {
 			error: undefined,
 			partyId: undefined,
 			isHost: false,
-			users: []
+			users: [],
+			settings: undefined
 		});
 	}
 
@@ -79,9 +130,12 @@ const usePartyStore = create((set, get) => {
 		partyId: undefined,
 		isHost: false,
 		users: [],
+		settings: undefined,
 		leaveParty,
 		createParty,
-		joinParty
+		joinParty,
+		updateSettings,
+		initSettings
 	};
 });
 

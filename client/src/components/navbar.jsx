@@ -1,22 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from './ui/button/index.js';
 import { Music2, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore.js';
 import usePartyStore from '../contexts/usePartyStore.js';
+import { CreatePartyDialog } from './PartyRoom/CreatePartyDialog';
 
 export function Navbar() {
 	const navigate = useNavigate();
 	const { user, logout, accessToken, isLoading } = useSpotifyAuthStore();
 	const createParty = usePartyStore(state => state.createParty);
+	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+	const [isCreating, setIsCreating] = useState(false);
 
 	const handleCreateParty = async () => {
+		setIsCreating(true);
 		try {
+			console.log('Creating party with settings:', usePartyStore.getState().settings);
 			const partyId = await createParty();
+			setIsCreateDialogOpen(false);
 			navigate(`/party/${partyId}`);
 		} catch (error) {
 			console.error('Failed to create party:', error);
-			// Optionally show an error toast/notification here
+		} finally {
+			setIsCreating(false);
 		}
 	};
 
@@ -43,7 +50,7 @@ export function Navbar() {
 								<LogOut className="w-4 h-4 mr-2" />
 								<span className="hidden sm:inline">Logout</span>
 							</Button>
-							<Button onClick={handleCreateParty} disabled={isLoading}>
+							<Button onClick={() => setIsCreateDialogOpen(true)} disabled={isLoading}>
 								{isLoading ? (
 									<div className="flex items-center space-x-2">
 										<div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
@@ -59,6 +66,13 @@ export function Navbar() {
 					)}
 				</div>
 			</div>
+
+			<CreatePartyDialog
+				open={isCreateDialogOpen}
+				onOpenChange={setIsCreateDialogOpen}
+				onCreateParty={handleCreateParty}
+				isLoading={isCreating}
+			/>
 		</nav>
 	);
 }
