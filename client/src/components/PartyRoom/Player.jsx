@@ -3,6 +3,7 @@ import { Play, Pause, SkipForward, Music2, Volume2, VolumeX, SkipBack } from 'lu
 import { Button } from '../ui/button';
 import * as Slider from '@radix-ui/react-slider';
 import usePlayerStore from '../../contexts/usePlayerStore';
+import { SimpleVote } from './SimpleVote';
 
 const formatTime = ms => {
 	const seconds = Math.floor((ms / 1000) % 60);
@@ -72,8 +73,7 @@ function SongInfo() {
 				<h3
 					className={`text-lg font-semibold transition-colors duration-200 ${
 						isCurrentTrackInQueue ? 'text-spotify-green' : 'text-white'
-					}`}
-				>
+					}`}>
 					{currentTrack?.name || 'Search for a song to play'}
 				</h3>
 				<p className="text-sm text-white/60">{currentTrack?.artists?.[0]?.name || 'Add songs to your queue'}</p>
@@ -132,8 +132,7 @@ function ProgressBar() {
 				step={1000}
 				onValueChange={handleSeek}
 				onValueCommit={onDragEnd}
-				aria-label="Playback Progress"
-			>
+				aria-label="Playback Progress">
 				<Slider.Track className="bg-white/20 relative grow rounded-full h-1">
 					<Slider.Range className="absolute bg-spotify-green rounded-full h-full" />
 				</Slider.Track>
@@ -151,6 +150,7 @@ function ProgressBar() {
 }
 
 function PlaybackControls() {
+	const [showSkipVote, setShowSkipVote] = useState(false);
 	const isPaused = usePlayerStore(state => state.isPaused);
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const volume = usePlayerStore(state => state.volume);
@@ -164,8 +164,7 @@ function PlaybackControls() {
 					size="sm"
 					onClick={backTrack}
 					disabled={!currentTrack}
-					className="hover:bg-white/10 transition-colors duration-200"
-				>
+					className="hover:bg-white/10 transition-colors duration-200">
 					<SkipBack className="w-6 h-6" />
 				</Button>
 				<Button
@@ -173,20 +172,34 @@ function PlaybackControls() {
 					size="sm"
 					onClick={togglePlay}
 					disabled={!currentTrack}
-					className="hover:bg-white/10 transition-colors duration-200"
-				>
+					className="hover:bg-white/10 transition-colors duration-200">
 					{!isPaused ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
 				</Button>
 				<Button
 					variant="ghost"
 					size="sm"
-					onClick={nextTrack}
+					onClick={() => setShowSkipVote(true)}
 					disabled={!currentTrack}
-					className="hover:bg-white/10 transition-colors duration-200"
-				>
+					className="hover:bg-white/10 transition-colors duration-200">
 					<SkipForward className="w-6 h-6" />
 				</Button>
 			</div>
+
+			{showSkipVote && currentTrack && (
+				<SimpleVote
+					title="Skip current song?"
+					description={`Skip "${currentTrack.name}" by ${currentTrack.artists[0].name}?`}
+					onPass={() => {
+						nextTrack();
+						setShowSkipVote(false);
+					}}
+					onFail={() => {
+						setShowSkipVote(false);
+					}}
+					duration={20}
+					type="skip"
+				/>
+			)}
 
 			{/* Volume Control */}
 			<div className="flex items-center space-x-4">
@@ -194,8 +207,7 @@ function PlaybackControls() {
 					variant="ghost"
 					size="sm"
 					onClick={() => setVolume(0)}
-					className="hover:bg-white/10 transition-colors duration-200"
-				>
+					className="hover:bg-white/10 transition-colors duration-200">
 					<VolumeX className="w-4 h-4" />
 				</Button>
 
@@ -207,8 +219,7 @@ function PlaybackControls() {
 						step={0.01}
 						value={[volume]}
 						onValueChange={([newVolume]) => setVolume(newVolume)}
-						aria-label="Volume"
-					>
+						aria-label="Volume">
 						<Slider.Track className="bg-white/20 relative grow rounded-full h-1">
 							<Slider.Range className="absolute bg-white rounded-full h-full" />
 						</Slider.Track>
@@ -223,8 +234,7 @@ function PlaybackControls() {
 					variant="ghost"
 					size="sm"
 					onClick={() => setVolume(1)}
-					className="hover:bg-white/10 transition-colors duration-200"
-				>
+					className="hover:bg-white/10 transition-colors duration-200">
 					<Volume2 className="w-4 h-4" />
 				</Button>
 			</div>
