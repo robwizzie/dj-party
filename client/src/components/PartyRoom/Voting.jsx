@@ -100,9 +100,15 @@ export function Voting() {
 
 			{phase === 'selection' && selectedSongs.length < 3 && (
 				<Search
-					customButton={track => (
-						<Button variant="ghost" size="sm" onClick={() => handleAddToQueue(track)}>
-							Cast Vote
+					selectedSongs={selectedSongs}
+					customButton={(track, isAlreadySelected) => (
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => handleAddToQueue(track)}
+							disabled={isAlreadySelected}
+							className={isAlreadySelected ? 'text-white/40' : ''}>
+							{isAlreadySelected ? 'Already Selected' : 'Cast Vote'}
 						</Button>
 					)}
 				/>
