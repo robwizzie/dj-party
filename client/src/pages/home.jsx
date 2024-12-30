@@ -5,6 +5,7 @@ import useSpotifyAuthStore from '../contexts/useSpotifyAuthStore';
 import usePartyStore from '../contexts/usePartyStore';
 import { JoinPartyDialog } from '../components/PartyRoom/JoinPartyDialog';
 import { CreatePartyDialog } from '../components/PartyRoom/CreatePartyDialog';
+import { toast } from 'sonner';
 
 export function Home() {
 	const { login, accessToken, user, isLoading, error } = useSpotifyAuthStore();
@@ -19,28 +20,35 @@ export function Home() {
 
 	async function handleCreateParty() {
 		setIsCreating(true);
-		try {
-			console.log('Creating party with settings:', usePartyStore.getState().settings);
-			const partyId = await createParty();
-			setIsCreateDialogOpen(false);
-			navigate(`/party/${partyId}`);
-		} catch (error) {
-			console.error('Failed to create party:', error);
-		} finally {
-			setIsCreating(false);
-		}
+		toast.promise(
+			(async () => {
+				const partyId = await createParty();
+				setIsCreateDialogOpen(false);
+				navigate(`/party/${partyId}`);
+			})(),
+			{
+				loading: 'Creating your party...',
+				success: 'Party created! Time to play some music 🎵',
+				error: 'Failed to create party'
+			}
+		);
+		setIsCreating(false);
 	}
 
 	async function handleJoinParty(partyId) {
 		setIsJoining(true);
 		try {
-			await joinParty(partyId);
+			await toast.promise(joinParty(partyId), {
+				loading: 'Joining party...',
+				success: 'Successfully joined the party! 🎉',
+				error: 'Failed to join party'
+			});
 			setTimeout(() => {
 				setIsJoinDialogOpen(false);
 				navigate(`/party/${partyId}`);
 			}, 100);
 		} catch (error) {
-			throw new Error('Unable to join party. Please check the party ID and try again.');
+			toast.error('Unable to join party. Please check the party ID and try again.');
 		} finally {
 			setIsJoining(false);
 		}
