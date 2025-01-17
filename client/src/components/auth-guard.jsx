@@ -8,7 +8,7 @@ export function AuthGuard({ children }) {
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
-				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-spotify-green" />
+				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-secondary" />
 			</div>
 		);
 	}

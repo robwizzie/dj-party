@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority';
 export const buttonVariants = cva('inline-flex items-center justify-center rounded-full font-semibold transition-colors', {
 	variants: {
 		variant: {
-			default: 'bg-spotify-green text-white hover:bg-opacity-80',
+			default: 'bg-brand-primary text-white hover:bg-opacity-80',
 			secondary: 'bg-white text-black hover:bg-opacity-80',
 			ghost: 'hover:bg-white hover:bg-opacity-10'
 		},

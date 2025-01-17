@@ -26,53 +26,50 @@ export function JoinPartyDialog({ open, onOpenChange, onJoin, isLoading }) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="min-w-[500px] flex flex-col pointer-events-auto p-0">
-				<DialogHeader className="px-6 py-4 border-b border-white/10">
-					<DialogTitle className="text-2xl font-bold">Join a Party</DialogTitle>
-					<DialogDescription className="text-white/60 mt-2">
+			<DialogContent className="sm:max-w-md p-6">
+				<DialogHeader className="mb-4">
+					<DialogTitle className="text-xl font-semibold">Join a Party</DialogTitle>
+					<DialogDescription className="mt-1.5">
 						Enter the party ID shared with you to join the music session.
 					</DialogDescription>
 				</DialogHeader>
 
-				<form onSubmit={handleSubmit} className="flex-1">
-					<div className="px-6 py-4">
-						<Input
+				<form onSubmit={handleSubmit} className="space-y-6">
+					<div className="space-y-3">
+						<input
 							placeholder="Enter party ID"
 							value={partyId}
 							onChange={e => {
 								setPartyId(e.target.value);
 								setError('');
 							}}
-							className="w-full"
+							className="w-full px-4 py-2.5 rounded-md bg-black/20 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2 focus:ring-offset-black"
 						/>
 
 						{error && (
-							<div className="bg-red-500/10 border border-red-500/20 rounded-md p-3 mt-3">
+							<div className="bg-red-500/10 border border-red-500/20 rounded-md p-3">
 								<p className="text-red-500 text-sm flex items-center gap-2">
-									<AlertCircle className="h-4 w-4" />
+									<AlertCircle className="h-4 w-4 shrink-0" />
 									{error}
 								</p>
 							</div>
 						)}
 					</div>
-
-					<DialogFooter className="px-6 py-4 border-t border-white/10">
-						<div className="flex justify-end gap-4">
-							<Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-								Cancel
-							</Button>
-							<Button type="submit" disabled={isLoading}>
-								{isLoading ? (
-									<div className="flex items-center gap-2">
-										<Loader2 className="h-4 w-4 animate-spin" />
-										Joining...
-									</div>
-								) : (
-									'Join Party'
-								)}
-							</Button>
-						</div>
-					</DialogFooter>
+					<div className="flex justify-end gap-3 pt-2">
+						<Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="px-4">
+							Cancel
+						</Button>
+						<Button type="submit" disabled={isLoading} className="px-4">
+							{isLoading ? (
+								<div className="flex items-center gap-2">
+									<Loader2 className="h-4 w-4 animate-spin" />
+									Joining...
+								</div>
+							) : (
+								'Join Party'
+							)}
+						</Button>
+					</div>
 				</form>
 			</DialogContent>
 		</Dialog>

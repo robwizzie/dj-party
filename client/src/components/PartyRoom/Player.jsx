@@ -30,7 +30,7 @@ export function Player() {
 	// }, [playbackState, playNext]);
 
 	return (
-		<div className="bg-spotify-gray rounded-lg p-6">
+		<div className="bg-brand-background-light rounded-lg p-6">
 			{isPaused}
 			{/* Album Art and Track Info */}
 			<SongInfo />
@@ -60,7 +60,7 @@ function SongInfo() {
 					src={currentTrack.albumImage || currentTrack.album.images[0].url}
 					alt="Album Art"
 					className={`w-24 h-24 rounded-md transition-all duration-200 ${
-						isCurrentTrackInQueue ? 'ring-2 ring-spotify-green shadow-lg' : ''
+						isCurrentTrackInQueue ? 'ring-2 ring-brand-secondary shadow-lg' : ''
 					}`}
 				/>
 			) : (
@@ -72,7 +72,7 @@ function SongInfo() {
 			<div className="flex-1">
 				<h3
 					className={`text-lg font-semibold transition-colors duration-200 ${
-						isCurrentTrackInQueue ? 'text-spotify-green' : 'text-white'
+						isCurrentTrackInQueue ? 'text-brand-secondary' : 'text-white'
 					}`}>
 					{currentTrack?.name || 'Search for a song to play'}
 				</h3>
@@ -134,10 +134,10 @@ function ProgressBar() {
 				onValueCommit={onDragEnd}
 				aria-label="Playback Progress">
 				<Slider.Track className="bg-white/20 relative grow rounded-full h-1">
-					<Slider.Range className="absolute bg-spotify-green rounded-full h-full" />
+					<Slider.Range className="absolute bg-brand-primary rounded-full h-full" />
 				</Slider.Track>
 				<Slider.Thumb
-					className="block w-3 h-3 bg-white rounded-full hover:bg-spotify-green focus:outline-none focus:ring-2 focus:ring-spotify-green opacity-0 hover:opacity-100 transition-opacity"
+					className="block w-3 h-3 bg-white rounded-full hover:bg-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary opacity-0 hover:opacity-100 transition-opacity"
 					aria-label="Playback Position"
 				/>
 			</Slider.Root>
@@ -224,7 +224,7 @@ function PlaybackControls() {
 							<Slider.Range className="absolute bg-white rounded-full h-full" />
 						</Slider.Track>
 						<Slider.Thumb
-							className="block w-3 h-3 bg-white rounded-full hover:bg-spotify-green focus:outline-none focus:ring-2 focus:ring-spotify-green"
+							className="block w-3 h-3 bg-white rounded-full hover:bg-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary"
 							aria-label="Volume"
 						/>
 					</Slider.Root>

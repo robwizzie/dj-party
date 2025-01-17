@@ -117,9 +117,9 @@ export function Voting() {
 			{selectedSongs.length > 0 && (
 				<div className="space-y-2 mt-4">
 					{phase === 'results' && winner && (
-						<div className="bg-spotify-green/10 p-6 rounded-lg mb-6 animate-fadeIn">
+						<div className="bg-brand-primary/10 p-6 rounded-lg mb-6 animate-fadeIn">
 							<div className="flex items-center justify-center gap-4 mb-4">
-								<Trophy className="w-8 h-8 text-spotify-green animate-bounce" />
+								<Trophy className="w-8 h-8 text-brand-secondary animate-bounce" />
 								<h3 className="text-2xl font-bold text-white">Winning Song!</h3>
 							</div>
 							<div className="flex items-center gap-4 bg-black/20 p-4 rounded-lg">
@@ -130,7 +130,7 @@ export function Voting() {
 								/>
 								<div>
 									<h4 className="text-xl font-bold text-white">{winner.track.name}</h4>
-									<p className="text-spotify-green">{winner.track.artists.map(a => a.name).join(', ')}</p>
+									<p className="text-brand-secondary">{winner.track.artists.map(a => a.name).join(', ')}</p>
 									<p className="text-white/60 mt-2">Added to queue</p>
 								</div>
 							</div>
@@ -150,10 +150,10 @@ export function Voting() {
                     relative p-4 rounded-lg border transition-all duration-200
                     ${
 						phase === 'voting' && !hasVoted
-							? 'cursor-pointer border-white/10 hover:border-spotify-green hover:bg-white/5'
+							? 'cursor-pointer border-white/10 hover:border-brand-secondary hover:bg-white/5'
 							: 'border-white/10'
 					}
-                    ${isWinner ? 'bg-spotify-green/20 border-spotify-green' : ''}
+                    ${isWinner ? 'bg-brand-primary/20 border-brand-secondary' : ''}
                   `}>
 									<div className="flex items-center gap-4">
 										<img
@@ -169,14 +169,14 @@ export function Voting() {
 											{submission.votes > 0 && (
 												<div className="mt-2 relative h-1 bg-white/10 rounded-full overflow-hidden">
 													<div
-														className="absolute top-0 left-0 h-full bg-spotify-green transition-all duration-500"
+														className="absolute top-0 left-0 h-full bg-brand-primary transition-all duration-500"
 														style={{ width: `${votePercentage}%` }}
 													/>
 												</div>
 											)}
 										</div>
 										{submission.votes > 0 && (
-											<div className="text-2xl font-bold text-spotify-green flex items-center gap-2">
+											<div className="text-2xl font-bold text-brand-secondary flex items-center gap-2">
 												{submission.votes}
 												<span className="text-sm text-white/60">({votePercentage.toFixed(0)}%)</span>
 											</div>

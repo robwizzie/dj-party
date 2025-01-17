@@ -59,7 +59,7 @@ export function Search({ onTrackSelect, customButton, selectedSongs = [] }) {
 						value={query}
 						onChange={handleInputChange}
 						placeholder="Search for songs..."
-						className="w-full bg-black/20 rounded-md py-2 pl-10 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-spotify-green"
+						className="w-full bg-black/20 rounded-md py-2 pl-10 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-brand-secondary"
 					/>
 				</div>
 			</div>
@@ -67,7 +67,7 @@ export function Search({ onTrackSelect, customButton, selectedSongs = [] }) {
 			<div className="space-y-2">
 				{isSearching ? (
 					<div className="flex justify-center py-4">
-						<Loader2 className="w-6 h-6 animate-spin text-spotify-green" />
+						<Loader2 className="w-6 h-6 animate-spin text-brand-secondary" />
 					</div>
 				) : results.length === 0 && query.trim() ? (
 					<p className="text-white/60 text-center py-4">No results found for "{query}"</p>
