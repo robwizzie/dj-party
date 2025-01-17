@@ -84,7 +84,7 @@ export function SimpleVote({ title, description, onPass, onFail, duration = 30, 
 	const votePercentage = (votes.yes.length / requiredVotes) * 100;
 
 	return (
-		<div className="bg-spotify-gray p-4 rounded-lg space-y-4">
+		<div className="bg-brand-background-light p-4 rounded-lg space-y-4">
 			<div className="flex justify-between items-start">
 				<div>
 					<h3 className="text-lg font-semibold text-white">{title}</h3>
@@ -104,7 +104,7 @@ export function SimpleVote({ title, description, onPass, onFail, duration = 30, 
 
 			<div className="mt-2 relative h-1 bg-white/10 rounded-full overflow-hidden">
 				<div
-					className="absolute top-0 left-0 h-full bg-spotify-green transition-all duration-500"
+					className="absolute top-0 left-0 h-full bg-brand-primary transition-all duration-500"
 					style={{ width: `${votePercentage}%` }}
 				/>
 			</div>
