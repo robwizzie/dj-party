@@ -14,7 +14,7 @@ export function AuthCallback() {
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen">
-			<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-spotify-green mb-4" />
+			<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-secondary mb-4" />
 			<p className="text-white/80">Connecting to Spotify...</p>
 		</div>
 	);

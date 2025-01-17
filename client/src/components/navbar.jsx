@@ -28,10 +28,10 @@ export function Navbar() {
 	};
 
 	return (
-		<nav className="border-b border-white/10 bg-spotify-black w-full">
+		<nav className="border-b border-white/10 bg-brand-background w-full">
 			<div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 				<Link to="/" className="flex items-center space-x-2">
-					<Music2 className="w-8 h-8 text-spotify-green" />
+					<Music2 className="w-8 h-8 text-brand-secondary" />
 					<span className="text-xl font-bold text-white">DJ Party</span>
 				</Link>
 

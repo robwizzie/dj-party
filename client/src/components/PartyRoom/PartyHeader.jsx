@@ -7,7 +7,7 @@ export function PartyHeader({ partyId }) {
 	};
 
 	return (
-		<div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-spotify-gray rounded-lg mb-6">
+		<div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-brand-background-light rounded-lg mb-6">
 			<div className="flex flex-col mb-4 sm:mb-0">
 				<h1 className="text-2xl font-bold">Party Room</h1>
 				<div className="flex items-center space-x-2">
