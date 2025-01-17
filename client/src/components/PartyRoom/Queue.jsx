@@ -2,8 +2,11 @@ import { Music, User, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import usePlayerStore from '../../contexts/usePlayerStore';
 import { useMemo } from 'react';
+import { useState } from 'react';
+import { SimpleVote } from './SimpleVote';
 
 export function Queue() {
+	const [showRemoveVote, setShowRemoveVote] = useState(null);
 	const playbackTimeline = usePlayerStore(state => state.playbackTimeline);
 	const currentSongIndex = usePlayerStore(state => state.index);
 	const currentTrack = usePlayerStore(state => state.currentTrack);
@@ -55,6 +58,24 @@ export function Queue() {
 								<X className="w-4 h-4" />
 							</Button>
 						</div>
+
+						{showRemoveVote === i && (
+							<div className="mt-2">
+								<SimpleVote
+									title="Remove from queue?"
+									description={`Remove "${item.name}" by ${item.artists[0].name} from the queue?`}
+									onPass={() => {
+										removeFromQueue(i + currentSongIndex + 1);
+										setShowRemoveVote(null);
+									}}
+									onFail={() => {
+										setShowRemoveVote(null);
+									}}
+									duration={20}
+									type="remove"
+								/>
+							</div>
+						)}
 					</div>
 				))}
 

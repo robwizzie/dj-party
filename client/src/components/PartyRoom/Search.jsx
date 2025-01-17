@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 import usePlayerStore from '../../contexts/usePlayerStore';
 import PropTypes from 'prop-types';
 
-export function Search({ onTrackSelect, customButton }) {
+export function Search({ onTrackSelect, customButton, selectedSongs = [] }) {
 	const [query, setQuery] = useState('');
 	const [isSearching, setIsSearching] = useState(false);
 	const [results, setResults] = useState([]);
@@ -83,7 +83,10 @@ export function Search({ onTrackSelect, customButton }) {
 									<p className="text-sm text-white/60 truncate">{track.artists.map(a => a.name).join(', ')}</p>
 								</div>
 								{customButton ? (
-									customButton(track)
+									customButton(
+										track,
+										selectedSongs.some(song => song.track.id === track.id)
+									)
 								) : (
 									<Button variant="ghost" size="sm" onClick={() => addToQueue(track)}>
 										Add to Queue
@@ -100,5 +103,6 @@ export function Search({ onTrackSelect, customButton }) {
 
 Search.propTypes = {
 	onTrackSelect: PropTypes.func,
-	customButton: PropTypes.func
+	customButton: PropTypes.func,
+	selectedSongs: PropTypes.array
 };

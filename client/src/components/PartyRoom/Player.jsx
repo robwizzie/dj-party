@@ -3,6 +3,7 @@ import { Play, Pause, SkipForward, Music2, Volume2, VolumeX, SkipBack } from 'lu
 import { Button } from '../ui/button';
 import * as Slider from '@radix-ui/react-slider';
 import usePlayerStore from '../../contexts/usePlayerStore';
+import { SimpleVote } from './SimpleVote';
 
 const formatTime = ms => {
 	const seconds = Math.floor((ms / 1000) % 60);
@@ -149,6 +150,7 @@ function ProgressBar() {
 }
 
 function PlaybackControls() {
+	const [showSkipVote, setShowSkipVote] = useState(false);
 	const isPaused = usePlayerStore(state => state.isPaused);
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const volume = usePlayerStore(state => state.volume);
@@ -176,12 +178,28 @@ function PlaybackControls() {
 				<Button
 					variant="ghost"
 					size="sm"
-					onClick={nextTrack}
+					onClick={() => setShowSkipVote(true)}
 					disabled={!currentTrack}
 					className="hover:bg-white/10 transition-colors duration-200">
 					<SkipForward className="w-6 h-6" />
 				</Button>
 			</div>
+
+			{showSkipVote && currentTrack && (
+				<SimpleVote
+					title="Skip current song?"
+					description={`Skip "${currentTrack.name}" by ${currentTrack.artists[0].name}?`}
+					onPass={() => {
+						nextTrack();
+						setShowSkipVote(false);
+					}}
+					onFail={() => {
+						setShowSkipVote(false);
+					}}
+					duration={20}
+					type="skip"
+				/>
+			)}
 
 			{/* Volume Control */}
 			<div className="flex items-center space-x-4">

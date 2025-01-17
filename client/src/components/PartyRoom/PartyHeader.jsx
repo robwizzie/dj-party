@@ -1,9 +1,17 @@
+import { useState } from 'react';
 import { Button } from '../ui/button';
 import { Copy } from 'lucide-react';
+import { ChangeSettingsDialog } from './ChangeSettingsDialog';
+import usePartyStore from '@/contexts/usePartyStore';
+import { toast } from 'sonner';
 
 export function PartyHeader({ partyId }) {
+	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+	const isHost = usePartyStore(state => state.isHost);
+
 	const copyPartyCode = () => {
 		navigator.clipboard.writeText(partyId);
+		toast.success('Party code copied to clipboard!');
 	};
 
 	return (
@@ -16,12 +24,19 @@ export function PartyHeader({ partyId }) {
 					<Button variant="ghost" size="sm" onClick={copyPartyCode}>
 						<Copy className="w-4 h-4" />
 					</Button>
+          </div>
+				</div>
+				<div className="flex space-x-4">
+					{isHost && (
+						<Button variant="ghost" onClick={() => setIsSettingsOpen(true)}>
+							Change Mode
+						</Button>
+					)}
+					<Button>Invite Friends</Button>
 				</div>
 			</div>
-			<div className="flex space-x-4">
-				<Button variant="ghost">Change Mode</Button>
-				<Button>Invite Friends</Button>
-			</div>
-		</div>
+
+			<ChangeSettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+		</>
 	);
 }

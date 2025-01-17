@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 import { create } from 'zustand';
 import { generatePromise } from '../utils/generatePromise';
+import { toast } from 'sonner';
 
 const DEFAULT_SETTINGS = {
 	password: {
@@ -69,9 +70,26 @@ const usePartyStore = create((set, get) => {
 					return;
 				}
 
-				if (confirm(`User ${user} would like to join your party.`)) {
-					callback({ isAccepted: true });
-				} else callback({ isAccepted: false });
+				toast(t => ({
+					title: 'Join Request',
+					description: `${user} would like to join your party.`,
+					action: {
+						label: 'Accept',
+						onClick: () => {
+							callback({ isAccepted: true });
+							toast.success(`Accepted ${user}'s join request`);
+							t.dismiss();
+						}
+					},
+					cancel: {
+						label: 'Decline',
+						onClick: () => {
+							callback({ isAccepted: false });
+							toast.error(`Declined ${user}'s join request`);
+							t.dismiss();
+						}
+					}
+				}));
 			});
 		});
 
@@ -98,11 +116,19 @@ const usePartyStore = create((set, get) => {
 
 			socket.on('user-joined', ({ user, users }) => {
 				console.log(`User ${user} has joined the party.`);
+				toast.info(`${user} joined the party 👋`);
 				set({ users });
 			});
 
 			socket.on('settings-updated', ({ settings }) => {
+				toast.info('Party settings have been updated');
 				set({ settings });
+			});
+
+			// Add this new listener for user leaves if you have it in your backend
+			socket.on('user-left', ({ user, users }) => {
+				toast(`${user} left the party`);
+				set({ users });
 			});
 		});
 

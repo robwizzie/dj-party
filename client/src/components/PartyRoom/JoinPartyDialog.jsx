@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import { AlertCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
-import { Loader2 } from 'lucide-react';
+import { Input } from '../ui/input';
 
 export function JoinPartyDialog({ open, onOpenChange, onJoin, isLoading }) {
 	const [partyId, setPartyId] = useState('');
@@ -45,6 +45,7 @@ export function JoinPartyDialog({ open, onOpenChange, onJoin, isLoading }) {
 							}}
 							className="w-full px-4 py-2.5 rounded-md bg-black/20 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2 focus:ring-offset-black"
 						/>
+
 						{error && (
 							<div className="bg-red-500/10 border border-red-500/20 rounded-md p-3">
 								<p className="text-red-500 text-sm flex items-center gap-2">
@@ -54,7 +55,6 @@ export function JoinPartyDialog({ open, onOpenChange, onJoin, isLoading }) {
 							</div>
 						)}
 					</div>
-
 					<div className="flex justify-end gap-3 pt-2">
 						<Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="px-4">
 							Cancel
