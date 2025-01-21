@@ -17,7 +17,16 @@ const DEFAULT_SETTINGS = {
 	anonymousVoting: false,
 	allowKicking: true,
 	songLimit: 0, // 0 means unlimited
-	playbackMode: 'host' // 'host' | 'individual'
+	playbackMode: 'host', // 'host' | 'individual'
+	partyType: 'regular', // 'regular' | 'dj'
+	isDJParty: false,
+	features: {
+		songVoting: false,
+		hypeMoments: false,
+		danceGroups: false,
+		shoutouts: false,
+		danceBattles: false
+	}
 };
 
 const usePartyStore = create((set, get) => {
