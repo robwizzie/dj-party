@@ -17,18 +17,40 @@ export function Home() {
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [isJoining, setIsJoining] = useState(false);
 	const [isCreating, setIsCreating] = useState(false);
+	const [partyType, setPartyType] = useState('regular');
+	const updateSettings = usePartyStore(state => state.updateSettings);
 
 	async function handleCreateParty() {
 		setIsCreating(true);
 		toast.promise(
 			(async () => {
+				// Update party settings based on type
+				updateSettings({
+					partyType: partyType,
+					isDJParty: partyType === 'dj',
+					// DJ-specific settings
+					features:
+						partyType === 'dj'
+							? {
+									songVoting: true,
+									hypeMoments: true,
+									danceGroups: true,
+									shoutouts: true,
+									danceBattles: true
+								}
+							: {}
+				});
+
 				const partyId = await createParty();
 				setIsCreateDialogOpen(false);
 				navigate(`/party/${partyId}`);
 			})(),
 			{
-				loading: 'Creating your party...',
-				success: 'Party created! Time to play some music 🎵',
+				loading: `Creating your ${partyType === 'dj' ? 'DJ party' : 'party'}...`,
+				success:
+					partyType === 'dj'
+						? 'DJ Party created! Time to rock the house 🎧'
+						: 'Party created! Time to play some music 🎵',
 				error: 'Failed to create party'
 			}
 		);
@@ -78,21 +100,39 @@ export function Home() {
 
 								{error && <p className="text-red-500 bg-red-500/10 rounded-lg p-3">{error.message}</p>}
 
-								<div className="flex gap-2 mx-auto my-3 w-fit">
+								<div className="flex flex-col sm:flex-row gap-2 mx-auto my-3 w-fit">
 									<Button
-										onClick={() => setIsCreateDialogOpen(true)}
+										onClick={() => {
+											setIsCreateDialogOpen(true);
+											setPartyType('dj');
+										}}
+										size="lg"
+										className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+										disabled={isLoading}>
+										Create DJ Party
+										<span className="ml-2">🎧</span>
+									</Button>
+
+									<Button
+										onClick={() => {
+											setIsCreateDialogOpen(true);
+											setPartyType('regular');
+										}}
 										size="lg"
 										className="w-full sm:w-auto px-8 py-3"
 										disabled={isLoading}>
-										Create New Party
+										Create Party
+										<span className="ml-2">🎵</span>
 									</Button>
 
 									<Button
 										onClick={() => setIsJoinDialogOpen(true)}
 										size="lg"
 										className="w-full sm:w-auto px-8 py-3"
+										variant="outline"
 										disabled={isLoading}>
-										Join Existing Party
+										Join Party
+										<span className="ml-2">🎉</span>
 									</Button>
 								</div>
 							</div>
@@ -127,6 +167,7 @@ export function Home() {
 				onOpenChange={setIsCreateDialogOpen}
 				onCreateParty={handleCreateParty}
 				isLoading={isCreating}
+				partyType={partyType}
 			/>
 
 			<JoinPartyDialog
